@@ -1,0 +1,4507 @@
+<!DOCTYPE html>
+<html lang="es-MX">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Interamb" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="theme-color" content="#060B16" />
+  <meta name="format-detection" content="telephone=no" />
+  <title>Interamb · Finanzas Personales</title>
+
+  <style>
+    /* ==========================================================================
+       INTERAMB — DESIGN SYSTEM (Deep Navy Dark Mode · Local-First iOS Aesthetic)
+       Zero external dependencies for 0ms offline startup.
+       ========================================================================== */
+    :root {
+      --bg-outer: #030712;
+      --bg-main: #060B16;
+      --bg-card: #0F1B2E;
+      --bg-card-hover: #13223A;
+      --bg-elevated: #162540;
+      --bg-elevated-2: #1E3254;
+      --border-subtle: rgba(148, 163, 184, 0.13);
+      --border-strong: rgba(148, 163, 184, 0.24);
+
+      --hero-gradient: linear-gradient(135deg, #10254A 0%, #1D4ED8 100%);
+      --accent-gradient: linear-gradient(135deg, #2563EB 0%, #38BDF8 100%);
+
+      --accent-cobalt: #3B82F6;
+      --accent-sky: #38BDF8;
+      --accent-soft: #60A5FA;
+
+      --income: #34D399;
+      --income-bg: rgba(52, 211, 153, 0.14);
+      --expense: #FB7185;
+      --expense-bg: rgba(251, 113, 133, 0.14);
+      --warning: #FBBF24;
+      --warning-bg: rgba(251, 191, 36, 0.14);
+
+      --text-primary: #F8FAFC;
+      --text-secondary: #94A3B8;
+      --text-muted: #64748B;
+
+      --radius-card: 24px;
+      --radius-md: 16px;
+      --radius-sm: 12px;
+      --radius-pill: 9999px;
+
+      --safe-top: env(safe-area-inset-top, 0px);
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+      --nav-height: 74px;
+      --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Segoe UI", Roboto, system-ui, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html, body {
+      height: 100%;
+      background-color: var(--bg-main);
+      color: var(--text-primary);
+      font-family: var(--font-sans);
+      font-size: 15px;
+      line-height: 1.4;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    /* Desktop centered phone container vs fullscreen mobile */
+    @media (min-width: 480px) {
+      body {
+        background: radial-gradient(circle at 50% 0%, #0E1C36 0%, var(--bg-outer) 70%);
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        padding: 18px 12px;
+      }
+    }
+
+    .app-shell {
+      width: 100%;
+      max-width: 430px;
+      min-height: 100dvh;
+      background-color: var(--bg-main);
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+    }
+
+    @media (min-width: 480px) {
+      .app-shell {
+        min-height: calc(100dvh - 36px);
+        max-height: 910px;
+        height: calc(100dvh - 36px);
+        border-radius: 36px;
+        border: 1px solid rgba(148, 163, 184, 0.18);
+        box-shadow: 0 28px 80px rgba(0, 0, 0, 0.72), 0 0 0 1px rgba(56, 189, 248, 0.08);
+        overflow: hidden;
+      }
+    }
+
+    /* Scrollable Main Viewport */
+    .app-content {
+      flex: 1;
+      overflow-y: auto;
+      overflow-x: hidden;
+      padding: calc(14px + var(--safe-top)) 16px calc(var(--nav-height) + var(--safe-bottom) + 28px);
+      scroll-behavior: smooth;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .app-content::-webkit-scrollbar {
+      width: 0;
+      display: none;
+    }
+
+    .tabular {
+      font-variant-numeric: tabular-nums;
+      letter-spacing: -0.015em;
+    }
+
+    /* Views */
+    .view {
+      display: none;
+      animation: viewFadeIn 0.22s ease-out;
+    }
+    .view.active {
+      display: block;
+    }
+
+    @keyframes viewFadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Header */
+    .top-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    .brand-block {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+    }
+
+    .brand-logo {
+      width: 36px;
+      height: 36px;
+      border-radius: 12px;
+      background: var(--hero-gradient);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 6px 16px rgba(29, 78, 216, 0.35);
+      flex-shrink: 0;
+    }
+
+    .brand-title {
+      font-size: 20px;
+      font-weight: 750;
+      letter-spacing: -0.025em;
+      color: var(--text-primary);
+    }
+
+    .brand-sub {
+      font-size: 11px;
+      color: var(--text-secondary);
+      display: block;
+      margin-top: -1px;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    /* Month Switcher Pill */
+    .month-switcher {
+      display: inline-flex;
+      align-items: center;
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-pill);
+      padding: 4px;
+      gap: 2px;
+    }
+
+    .month-btn {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      border: none;
+      background: transparent;
+      color: var(--text-secondary);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s;
+    }
+
+    .month-btn:active {
+      background: var(--bg-elevated);
+      color: var(--text-primary);
+    }
+
+    .month-label {
+      font-size: 13px;
+      font-weight: 650;
+      color: var(--text-primary);
+      padding: 0 6px;
+      min-width: 78px;
+      text-align: center;
+      text-transform: capitalize;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .icon-circle-btn {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-primary);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: transform 0.15s, background 0.15s;
+    }
+
+    .icon-circle-btn:active {
+      transform: scale(0.94);
+      background: var(--bg-elevated);
+    }
+
+    /* Modular Cards */
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-card);
+      padding: 18px;
+      margin-bottom: 14px;
+    }
+
+    .card-tight {
+      padding: 15px 16px;
+    }
+
+    /* Hero Progress Card */
+    .hero-card {
+      background: var(--hero-gradient);
+      border: 1px solid rgba(96, 165, 250, 0.28);
+      border-radius: 26px;
+      padding: 20px;
+      margin-bottom: 14px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 14px 36px rgba(16, 37, 74, 0.55);
+    }
+
+    .hero-card::after {
+      content: "";
+      position: absolute;
+      width: 190px;
+      height: 190px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(56, 189, 248, 0.22) 0%, transparent 70%);
+      top: -65px;
+      right: -45px;
+      pointer-events: none;
+    }
+
+    .hero-grid {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero-left {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .hero-eyebrow {
+      font-size: 12px;
+      font-weight: 600;
+      color: rgba(226, 232, 240, 0.85);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 6px;
+    }
+
+    .hero-balance {
+      font-size: 28px;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      color: #FFFFFF;
+      line-height: 1.15;
+      margin-bottom: 12px;
+      word-break: break-word;
+    }
+
+    .hero-balance.negative {
+      color: #FECDD3;
+    }
+
+    .msi-toggle-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      background: rgba(6, 11, 22, 0.34);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: var(--radius-pill);
+      padding: 5px 11px 5px 8px;
+      color: #F8FAFC;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s, border-color 0.2s;
+    }
+
+    .msi-toggle-pill .dot-switch {
+      width: 26px;
+      height: 15px;
+      border-radius: 99px;
+      background: rgba(148, 163, 184, 0.35);
+      position: relative;
+      transition: background 0.2s;
+    }
+
+    .msi-toggle-pill .dot-switch::after {
+      content: "";
+      position: absolute;
+      width: 11px;
+      height: 11px;
+      border-radius: 50%;
+      background: #FFFFFF;
+      top: 2px;
+      left: 2px;
+      transition: transform 0.2s;
+    }
+
+    .msi-toggle-pill.active {
+      background: rgba(56, 189, 248, 0.22);
+      border-color: rgba(56, 189, 248, 0.55);
+    }
+
+    .msi-toggle-pill.active .dot-switch {
+      background: var(--accent-sky);
+    }
+
+    .msi-toggle-pill.active .dot-switch::after {
+      transform: translateX(11px);
+    }
+
+    /* Circular SVG Ring */
+    .hero-ring-wrap {
+      width: 96px;
+      height: 96px;
+      position: relative;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .hero-ring-svg {
+      width: 96px;
+      height: 96px;
+      transform: rotate(-90deg);
+    }
+
+    .ring-bg {
+      fill: none;
+      stroke: rgba(255, 255, 255, 0.16);
+      stroke-width: 8.5;
+    }
+
+    .ring-fg {
+      fill: none;
+      stroke: #38BDF8;
+      stroke-width: 8.5;
+      stroke-linecap: round;
+      transition: stroke-dashoffset 0.55s cubic-bezier(0.22, 1, 0.36, 1), stroke 0.25s;
+    }
+
+    .ring-center {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 6px;
+    }
+
+    .ring-pct {
+      font-size: 18px;
+      font-weight: 800;
+      color: #FFFFFF;
+      line-height: 1.05;
+    }
+
+    .ring-label {
+      font-size: 9.5px;
+      font-weight: 600;
+      color: rgba(226, 232, 240, 0.85);
+      margin-top: 2px;
+      line-height: 1.1;
+    }
+
+    /* 2-Column Summary Grid */
+    .summary-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .stat-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 22px;
+      padding: 15px 15px 14px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-width: 0;
+    }
+
+    .stat-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+
+    .stat-title {
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+
+    .stat-badge {
+      width: 28px;
+      height: 28px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .stat-badge.income {
+      background: var(--income-bg);
+      color: var(--income);
+    }
+
+    .stat-badge.expense {
+      background: var(--expense-bg);
+      color: var(--expense);
+    }
+
+    .stat-amount {
+      font-size: 19px;
+      font-weight: 750;
+      color: var(--text-primary);
+      line-height: 1.2;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .stat-sub {
+      font-size: 11px;
+      color: var(--text-secondary);
+      margin-top: 4px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* Weekly Calendar Strip */
+    .cal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+      gap: 8px;
+    }
+
+    .cal-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-primary);
+      text-transform: capitalize;
+    }
+
+    .cal-controls {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .pill-toggle {
+      border: 1px solid var(--border-subtle);
+      background: var(--bg-elevated);
+      color: var(--text-secondary);
+      font-size: 11.5px;
+      font-weight: 600;
+      padding: 5px 10px;
+      border-radius: var(--radius-pill);
+      cursor: pointer;
+      transition: all 0.18s;
+    }
+
+    .pill-toggle.active {
+      background: rgba(59, 130, 246, 0.22);
+      border-color: var(--accent-cobalt);
+      color: var(--accent-sky);
+    }
+
+    .mini-arrow {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      border: 1px solid var(--border-subtle);
+      background: var(--bg-elevated);
+      color: var(--text-secondary);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+
+    .mini-arrow:active {
+      background: var(--bg-elevated-2);
+      color: var(--text-primary);
+    }
+
+    .week-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 4px;
+    }
+
+    .day-cell {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 8px 2px 7px;
+      border-radius: 16px;
+      cursor: pointer;
+      border: 1px solid transparent;
+      transition: all 0.16s;
+      user-select: none;
+    }
+
+    .day-cell .day-wd {
+      font-size: 10.5px;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+    }
+
+    .day-cell .day-num {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-primary);
+      line-height: 1.1;
+    }
+
+    .day-cell.other-month .day-num {
+      color: var(--text-muted);
+      opacity: 0.55;
+    }
+
+    .day-cell.today {
+      border-color: rgba(56, 189, 248, 0.45);
+      background: rgba(56, 189, 248, 0.08);
+    }
+
+    .day-cell.selected {
+      background: var(--accent-gradient);
+      border-color: transparent;
+      box-shadow: 0 6px 14px rgba(37, 99, 235, 0.4);
+    }
+
+    .day-cell.selected .day-wd,
+    .day-cell.selected .day-num {
+      color: #FFFFFF;
+    }
+
+    .day-dots {
+      display: flex;
+      gap: 3px;
+      height: 5px;
+      margin-top: 5px;
+      align-items: center;
+    }
+
+    .day-dot {
+      width: 4.5px;
+      height: 4.5px;
+      border-radius: 50%;
+    }
+
+    .day-dot.inc { background: var(--income); }
+    .day-dot.exp { background: var(--expense); }
+    .day-cell.selected .day-dot { background: #FFFFFF; }
+
+    /* Section Headings */
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin: 16px 2px 10px;
+    }
+
+    .section-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .section-meta {
+      font-size: 12px;
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+
+    /* Transaction List */
+    .tx-list {
+      display: flex;
+      flex-direction: column;
+      gap: 9px;
+    }
+
+    .tx-item {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 20px;
+      padding: 13px 14px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      cursor: pointer;
+      transition: transform 0.14s, background 0.14s, border-color 0.14s;
+    }
+
+    .tx-item:active {
+      transform: scale(0.985);
+      background: var(--bg-card-hover);
+    }
+
+    .tx-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 15px;
+      background: var(--bg-elevated);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      flex-shrink: 0;
+    }
+
+    .tx-body {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .tx-title {
+      font-size: 14.5px;
+      font-weight: 650;
+      color: var(--text-primary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .tx-meta {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 3px;
+      font-size: 11.5px;
+      color: var(--text-secondary);
+    }
+
+    .method-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: var(--bg-elevated);
+      padding: 2px 7px;
+      border-radius: 99px;
+      font-size: 10.5px;
+      font-weight: 600;
+      color: #CBD5E1;
+      max-width: 138px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .method-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .tx-amount {
+      font-size: 15px;
+      font-weight: 750;
+      text-align: right;
+      flex-shrink: 0;
+    }
+
+    .tx-amount.income { color: var(--income); }
+    .tx-amount.expense { color: var(--expense); }
+
+    /* Empty State */
+    .empty-state {
+      background: var(--bg-card);
+      border: 1px dashed rgba(148, 163, 184, 0.25);
+      border-radius: 24px;
+      padding: 28px 20px;
+      text-align: center;
+    }
+
+    .empty-emoji {
+      font-size: 34px;
+      margin-bottom: 10px;
+    }
+
+    .empty-title {
+      font-size: 15.5px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 6px;
+    }
+
+    .empty-desc {
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin-bottom: 18px;
+      line-height: 1.45;
+    }
+
+    .empty-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      align-items: center;
+    }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      border: none;
+      border-radius: 16px;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 650;
+      padding: 13px 18px;
+      cursor: pointer;
+      transition: transform 0.14s, opacity 0.14s, background 0.14s;
+      width: 100%;
+    }
+
+    .btn:active {
+      transform: scale(0.98);
+    }
+
+    .btn-primary {
+      background: var(--accent-gradient);
+      color: #FFFFFF;
+      box-shadow: 0 8px 20px rgba(37, 99, 235, 0.35);
+    }
+
+    .btn-secondary {
+      background: var(--bg-elevated);
+      color: var(--text-primary);
+      border: 1px solid var(--border-subtle);
+    }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--accent-sky);
+      padding: 9px 14px;
+      width: auto;
+      font-size: 13px;
+    }
+
+    .btn-danger {
+      background: rgba(251, 113, 133, 0.16);
+      color: var(--expense);
+      border: 1px solid rgba(251, 113, 133, 0.32);
+    }
+
+    .btn-sm {
+      padding: 8px 12px;
+      font-size: 12.5px;
+      border-radius: 12px;
+      width: auto;
+    }
+
+    /* ==========================================================================
+       ANALYSIS VIEW (CHARTS)
+       ========================================================================== */
+    .kpi-strip {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+
+    .kpi-mini {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 18px;
+      padding: 12px 10px;
+      text-align: center;
+    }
+
+    .kpi-mini-label {
+      font-size: 10.5px;
+      color: var(--text-secondary);
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .kpi-mini-val {
+      font-size: 14px;
+      font-weight: 750;
+      color: var(--text-primary);
+    }
+
+    .chart-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .chart-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .seg-mini {
+      display: inline-flex;
+      background: var(--bg-elevated);
+      border-radius: 99px;
+      padding: 3px;
+      border: 1px solid var(--border-subtle);
+    }
+
+    .seg-mini button {
+      border: none;
+      background: transparent;
+      color: var(--text-secondary);
+      font-family: inherit;
+      font-size: 11px;
+      font-weight: 650;
+      padding: 5px 10px;
+      border-radius: 99px;
+      cursor: pointer;
+      transition: all 0.18s;
+    }
+
+    .seg-mini button.active {
+      background: var(--accent-cobalt);
+      color: #FFFFFF;
+    }
+
+    .chart-readout {
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-subtle);
+      border-radius: 14px;
+      padding: 10px 12px;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      font-size: 12px;
+    }
+
+    .chart-legend-row {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      font-size: 11.5px;
+      color: var(--text-secondary);
+      margin-top: 8px;
+      justify-content: center;
+    }
+
+    .legend-dot {
+      display: inline-block;
+      width: 9px;
+      height: 9px;
+      border-radius: 3px;
+      margin-right: 5px;
+      vertical-align: middle;
+    }
+
+    .bar-chart-svg {
+      width: 100%;
+      height: 195px;
+      display: block;
+      overflow: visible;
+    }
+
+    .bar-group {
+      cursor: pointer;
+    }
+
+    /* Donut Chart */
+    .donut-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+
+    .donut-box {
+      position: relative;
+      width: 184px;
+      height: 184px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .donut-svg {
+      width: 184px;
+      height: 184px;
+      transform: rotate(-90deg);
+    }
+
+    .donut-slice {
+      fill: none;
+      stroke-width: 24;
+      cursor: pointer;
+      transition: stroke-width 0.2s, opacity 0.2s;
+    }
+
+    .donut-center {
+      position: absolute;
+      inset: 28px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      pointer-events: none;
+    }
+
+    .donut-center-label {
+      font-size: 11px;
+      color: var(--text-secondary);
+      font-weight: 600;
+      max-width: 110px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .donut-center-val {
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--text-primary);
+      margin-top: 2px;
+    }
+
+    .donut-center-pct {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--accent-sky);
+      margin-top: 1px;
+    }
+
+    .rank-list {
+      display: flex;
+      flex-direction: column;
+      gap: 11px;
+      width: 100%;
+    }
+
+    .rank-row {
+      cursor: pointer;
+      padding: 6px 8px;
+      border-radius: 12px;
+      transition: background 0.15s;
+    }
+
+    .rank-row.highlighted {
+      background: var(--bg-elevated);
+    }
+
+    .rank-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 13px;
+      margin-bottom: 5px;
+      gap: 8px;
+    }
+
+    .rank-name {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-weight: 600;
+      color: var(--text-primary);
+      min-width: 0;
+    }
+
+    .rank-name span.txt {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .rank-nums {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+      font-weight: 650;
+    }
+
+    .rank-pct {
+      font-size: 11.5px;
+      color: var(--text-secondary);
+      min-width: 34px;
+      text-align: right;
+    }
+
+    .progress-track {
+      width: 100%;
+      height: 6px;
+      background: var(--bg-elevated);
+      border-radius: 99px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      border-radius: 99px;
+      transition: width 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    /* ==========================================================================
+       MSI MODULE
+       ========================================================================== */
+    .msi-hero {
+      background: linear-gradient(135deg, #0E2042 0%, #173369 100%);
+      border: 1px solid rgba(56, 189, 248, 0.25);
+      border-radius: 26px;
+      padding: 18px 20px;
+      margin-bottom: 14px;
+    }
+
+    .msi-hero-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .msi-hero-amount {
+      font-size: 27px;
+      font-weight: 800;
+      color: #FFFFFF;
+      line-height: 1.15;
+    }
+
+    .msi-hero-sub-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      padding-top: 12px;
+      border-top: 1px solid rgba(148, 163, 184, 0.16);
+    }
+
+    .msi-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 22px;
+      padding: 16px;
+      margin-bottom: 11px;
+    }
+
+    .msi-card.completed {
+      opacity: 0.72;
+      border-style: dashed;
+    }
+
+    .msi-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .msi-concept {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 4px;
+    }
+
+    .msi-pill {
+      background: rgba(56, 189, 248, 0.16);
+      color: var(--accent-sky);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      font-size: 11.5px;
+      font-weight: 750;
+      padding: 4px 10px;
+      border-radius: 99px;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .msi-pill.done {
+      background: var(--income-bg);
+      color: var(--income);
+      border-color: rgba(52, 211, 153, 0.35);
+    }
+
+    .msi-pill.upcoming {
+      background: var(--warning-bg);
+      color: var(--warning);
+      border-color: rgba(251, 191, 36, 0.35);
+    }
+
+    .msi-numbers {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin: 10px 0 8px;
+      font-size: 13px;
+    }
+
+    .msi-monthly {
+      font-size: 16px;
+      font-weight: 750;
+      color: var(--text-primary);
+    }
+
+    .msi-remaining {
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+
+    .msi-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px solid var(--border-subtle);
+      font-size: 11.5px;
+      color: var(--text-secondary);
+    }
+
+    .msi-actions {
+      display: flex;
+      gap: 6px;
+    }
+
+    .chip-action {
+      border: 1px solid var(--border-subtle);
+      background: var(--bg-elevated);
+      color: var(--text-primary);
+      font-size: 11.5px;
+      font-weight: 600;
+      padding: 5px 10px;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+
+    .chip-action.danger {
+      color: var(--expense);
+      border-color: rgba(251, 113, 133, 0.25);
+    }
+
+    /* ==========================================================================
+       CARDS & SETTINGS VIEW
+       ========================================================================== */
+    .account-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 20px;
+      padding: 15px 16px;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 13px;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+
+    .account-card:active {
+      background: var(--bg-card-hover);
+    }
+
+    .account-stripe {
+      width: 10px;
+      height: 46px;
+      border-radius: 99px;
+      flex-shrink: 0;
+    }
+
+    .account-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .account-name {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+
+    .type-badge {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      padding: 2px 7px;
+      border-radius: 99px;
+      background: var(--bg-elevated);
+      color: var(--text-secondary);
+    }
+
+    .account-sub {
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin-top: 3px;
+    }
+
+    .account-countdown {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      margin-top: 5px;
+      font-size: 11.5px;
+      font-weight: 650;
+      color: var(--accent-sky);
+      background: rgba(56, 189, 248, 0.12);
+      padding: 3px 9px;
+      border-radius: 99px;
+    }
+
+    .account-spend {
+      text-align: right;
+      flex-shrink: 0;
+    }
+
+    .cat-manage-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .cat-pill-manage {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-subtle);
+      border-radius: 14px;
+      padding: 8px 11px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .cat-del-x {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      border: none;
+      background: rgba(251, 113, 133, 0.16);
+      color: var(--expense);
+      font-size: 13px;
+      line-height: 1;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      margin-left: 2px;
+    }
+
+    .backup-list {
+      display: flex;
+      flex-direction: column;
+      gap: 9px;
+    }
+
+    .backup-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-subtle);
+      border-radius: 16px;
+      padding: 13px 14px;
+      cursor: pointer;
+      text-align: left;
+      color: var(--text-primary);
+      font-family: inherit;
+      width: 100%;
+      transition: background 0.15s;
+    }
+
+    .backup-row:active {
+      background: var(--bg-elevated-2);
+    }
+
+    .backup-row-left {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      min-width: 0;
+    }
+
+    .backup-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 12px;
+      background: rgba(59, 130, 246, 0.16);
+      color: var(--accent-sky);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .backup-icon.danger {
+      background: var(--expense-bg);
+      color: var(--expense);
+    }
+
+    .backup-title {
+      font-size: 13.5px;
+      font-weight: 650;
+    }
+
+    .backup-desc {
+      font-size: 11.5px;
+      color: var(--text-secondary);
+      margin-top: 1px;
+    }
+
+    /* ==========================================================================
+       BOTTOM TAB NAVIGATION (5 Slots + Floating Center + Button)
+       ========================================================================== */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      max-width: 430px;
+      height: calc(var(--nav-height) + var(--safe-bottom));
+      padding: 0 8px var(--safe-bottom);
+      background: rgba(8, 15, 29, 0.88);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-top: 1px solid rgba(148, 163, 184, 0.15);
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      align-items: center;
+      z-index: 40;
+    }
+
+    @media (min-width: 480px) {
+      .bottom-nav {
+        position: absolute;
+        left: 0;
+        transform: none;
+        max-width: 100%;
+        border-bottom-left-radius: 36px;
+        border-bottom-right-radius: 36px;
+      }
+    }
+
+    .nav-btn {
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      height: 58px;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 10.5px;
+      font-weight: 650;
+      transition: color 0.16s;
+      position: relative;
+    }
+
+    .nav-btn.active {
+      color: var(--accent-sky);
+    }
+
+    .nav-btn.active::after {
+      content: "";
+      position: absolute;
+      bottom: 4px;
+      width: 16px;
+      height: 3px;
+      border-radius: 99px;
+      background: var(--accent-sky);
+    }
+
+    .fab-slot {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .fab-btn {
+      width: 56px;
+      height: 56px;
+      border-radius: 20px;
+      border: 2px solid rgba(186, 230, 253, 0.35);
+      background: var(--accent-gradient);
+      color: #FFFFFF;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transform: translateY(-10px);
+      box-shadow: 0 10px 26px rgba(37, 99, 235, 0.55);
+      transition: transform 0.16s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.16s;
+    }
+
+    .fab-btn:active {
+      transform: translateY(-8px) scale(0.93);
+    }
+
+    /* ==========================================================================
+       BOTTOM SHEETS & MODALS
+       ========================================================================== */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(2, 6, 16, 0.72);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      display: none;
+      align-items: flex-end;
+      justify-content: center;
+      z-index: 80;
+      opacity: 0;
+      transition: opacity 0.2s ease;
+    }
+
+    @media (min-width: 480px) {
+      .modal-backdrop {
+        position: absolute;
+        border-radius: 36px;
+      }
+    }
+
+    .modal-backdrop.open {
+      display: flex;
+      opacity: 1;
+    }
+
+    .sheet {
+      width: 100%;
+      max-width: 430px;
+      max-height: 90%;
+      overflow-y: auto;
+      background: #0D1729;
+      border-top-left-radius: 28px;
+      border-top-right-radius: 28px;
+      border-top: 1px solid rgba(148, 163, 184, 0.22);
+      padding: 12px 18px calc(22px + var(--safe-bottom));
+      transform: translateY(28px);
+      transition: transform 0.26s cubic-bezier(0.22, 1, 0.36, 1);
+      box-shadow: 0 -18px 50px rgba(0, 0, 0, 0.65);
+    }
+
+    .modal-backdrop.open .sheet {
+      transform: translateY(0);
+    }
+
+    .sheet-handle {
+      width: 42px;
+      height: 5px;
+      border-radius: 99px;
+      background: rgba(148, 163, 184, 0.35);
+      margin: 0 auto 14px;
+    }
+
+    .sheet-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+
+    .sheet-title {
+      font-size: 18px;
+      font-weight: 750;
+      color: var(--text-primary);
+    }
+
+    .close-btn {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      border: none;
+      background: var(--bg-elevated);
+      color: var(--text-secondary);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+
+    /* Confirmation Dialog (Centered) */
+    .dialog-backdrop {
+      align-items: center;
+      padding: 20px;
+      z-index: 100;
+    }
+
+    .dialog-box {
+      width: 100%;
+      max-width: 340px;
+      background: #101E35;
+      border: 1px solid var(--border-strong);
+      border-radius: 24px;
+      padding: 22px 20px 18px;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.7);
+      text-align: center;
+    }
+
+    .dialog-title {
+      font-size: 17px;
+      font-weight: 750;
+      margin-bottom: 8px;
+    }
+
+    .dialog-msg {
+      font-size: 13.5px;
+      color: var(--text-secondary);
+      line-height: 1.45;
+      margin-bottom: 18px;
+    }
+
+    .dialog-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    /* Form Controls */
+    .segmented-switch {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-subtle);
+      border-radius: 16px;
+      padding: 4px;
+      margin-bottom: 16px;
+      gap: 4px;
+    }
+
+    .seg-btn {
+      border: none;
+      background: transparent;
+      color: var(--text-secondary);
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 700;
+      padding: 10px;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.18s;
+    }
+
+    .seg-btn.active-expense {
+      background: rgba(251, 113, 133, 0.2);
+      color: var(--expense);
+      box-shadow: inset 0 0 0 1px rgba(251, 113, 133, 0.35);
+    }
+
+    .seg-btn.active-income {
+      background: rgba(52, 211, 153, 0.2);
+      color: var(--income);
+      box-shadow: inset 0 0 0 1px rgba(52, 211, 153, 0.35);
+    }
+
+    .amount-input-wrap {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--bg-elevated);
+      border: 1.5px solid var(--border-subtle);
+      border-radius: 20px;
+      padding: 12px 16px;
+      margin-bottom: 16px;
+      transition: border-color 0.2s;
+    }
+
+    .amount-input-wrap:focus-within {
+      border-color: var(--accent-sky);
+    }
+
+    .amount-prefix {
+      font-size: 28px;
+      font-weight: 750;
+      color: var(--text-secondary);
+      margin-right: 4px;
+    }
+
+    .amount-input {
+      background: transparent;
+      border: none;
+      outline: none;
+      color: var(--text-primary);
+      font-family: inherit;
+      font-size: 34px;
+      font-weight: 800;
+      width: 100%;
+      max-width: 240px;
+      text-align: center;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .amount-input::placeholder {
+      color: var(--text-muted);
+    }
+
+    .field-group {
+      margin-bottom: 14px;
+    }
+
+    .field-label {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+      font-weight: 650;
+      color: var(--text-secondary);
+      margin-bottom: 7px;
+      padding-left: 2px;
+    }
+
+    .text-input, .select-input {
+      width: 100%;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-subtle);
+      border-radius: 14px;
+      padding: 12px 14px;
+      color: var(--text-primary);
+      font-family: inherit;
+      font-size: 14.5px;
+      outline: none;
+      transition: border-color 0.18s;
+      color-scheme: dark;
+    }
+
+    .text-input:focus, .select-input:focus {
+      border-color: var(--accent-sky);
+    }
+
+    .two-col-fields {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    /* Interactive Chips Grid */
+    .chips-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 9px 12px;
+      border-radius: 14px;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-primary);
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .chip.selected {
+      background: rgba(59, 130, 246, 0.24);
+      border-color: var(--accent-sky);
+      color: #FFFFFF;
+      box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.25);
+    }
+
+    .chip.add-new {
+      border-style: dashed;
+      border-color: rgba(56, 189, 248, 0.5);
+      color: var(--accent-sky);
+      background: rgba(56, 189, 248, 0.08);
+    }
+
+    /* Inline New Category Box */
+    .inline-cat-box {
+      background: #13223A;
+      border: 1px solid rgba(56, 189, 248, 0.35);
+      border-radius: 16px;
+      padding: 12px;
+      margin-top: 10px;
+      display: none;
+    }
+
+    .inline-cat-box.open {
+      display: block;
+      animation: viewFadeIn 0.18s ease-out;
+    }
+
+    .emoji-picker {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin: 8px 0 10px;
+    }
+
+    .emoji-opt {
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      border: 1px solid transparent;
+      background: var(--bg-elevated);
+      font-size: 18px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+
+    .emoji-opt.selected {
+      border-color: var(--accent-sky);
+      background: rgba(56, 189, 248, 0.22);
+    }
+
+    .color-swatches {
+      display: flex;
+      gap: 9px;
+      flex-wrap: wrap;
+    }
+
+    .color-swatch {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: 2.5px solid transparent;
+      cursor: pointer;
+      transition: transform 0.14s;
+    }
+
+    .color-swatch.selected {
+      border-color: #FFFFFF;
+      transform: scale(1.12);
+    }
+
+    .preview-banner {
+      background: rgba(56, 189, 248, 0.12);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      border-radius: 14px;
+      padding: 11px 13px;
+      margin-bottom: 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 13px;
+    }
+
+    /* Toast Notification */
+    .toast {
+      position: fixed;
+      top: calc(14px + var(--safe-top));
+      left: 50%;
+      transform: translateX(-50%) translateY(-90px);
+      background: #122340;
+      border: 1px solid rgba(56, 189, 248, 0.4);
+      color: var(--text-primary);
+      padding: 11px 18px;
+      border-radius: 99px;
+      font-size: 13px;
+      font-weight: 650;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.55);
+      z-index: 120;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      max-width: 90%;
+      pointer-events: none;
+      opacity: 0;
+      transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.22s;
+    }
+
+    @media (min-width: 480px) {
+      .toast {
+        position: absolute;
+      }
+    }
+
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body>
+  <div class="app-shell" id="appShell">
+    <!-- Toast Notification -->
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+    <!-- Main Scrollable Viewport -->
+    <main class="app-content" id="appContent">
+
+      <!-- ================================================================
+           VIEW 1: INICIO (HOME)
+           ================================================================ -->
+      <section class="view active" id="view-home">
+        <header class="top-header">
+          <div class="brand-block">
+            <div class="brand-logo" aria-hidden="true">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                <circle cx="12" cy="12" r="8.5" stroke="#38BDF8" stroke-width="2.4" stroke-dasharray="38 16" stroke-linecap="round"/>
+                <path d="M12 7.5V16.5M9.5 10.5L12 8L14.5 10.5" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <div>
+              <h1 class="brand-title">Interamb</h1>
+              <span class="brand-sub" id="homeTodayLabel">Finanzas al instante</span>
+            </div>
+          </div>
+
+          <div class="header-actions">
+            <div class="month-switcher" aria-label="Cambiar mes">
+              <button class="month-btn" data-month-nav="-1" aria-label="Mes anterior">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+              </button>
+              <span class="month-label" data-month-label title="Ir al mes actual">Nov 2026</span>
+              <button class="month-btn" data-month-nav="1" aria-label="Mes siguiente">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+              </button>
+            </div>
+            <button class="icon-circle-btn" id="btnQuickExport" aria-label="Exportar o respaldar">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                <polyline points="7 10 12 15 17 10"/>
+                <line x1="12" y1="15" x2="12" y2="3"/>
+              </svg>
+            </button>
+          </div>
+        </header>
+
+        <!-- Hero Balance & Progress Ring Card -->
+        <div class="hero-card">
+          <div class="hero-grid">
+            <div class="hero-left">
+              <div class="hero-eyebrow">
+                <span>Balance del mes</span>
+              </div>
+              <div class="hero-balance tabular" id="heroBalance">$0.00</div>
+              <button type="button" class="msi-toggle-pill active" id="btnToggleMSI">
+                <span class="dot-switch"></span>
+                <span>Incluir MSI</span>
+              </button>
+            </div>
+
+            <div class="hero-ring-wrap" aria-label="Porcentaje de ingresos gastados">
+              <svg class="hero-ring-svg" viewBox="0 0 100 100">
+                <circle class="ring-bg" cx="50" cy="50" r="41"></circle>
+                <circle class="ring-fg" id="heroRingFg" cx="50" cy="50" r="41" stroke-dasharray="257.61" stroke-dashoffset="257.61"></circle>
+              </svg>
+              <div class="ring-center">
+                <span class="ring-pct tabular" id="heroRingPct">0%</span>
+                <span class="ring-label" id="heroRingLabel">gastado</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2-Column Income / Expense Summary Cards -->
+        <div class="summary-grid">
+          <div class="stat-card">
+            <div class="stat-head">
+              <span class="stat-title">Ingresos</span>
+              <span class="stat-badge income" aria-hidden="true">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>
+              </span>
+            </div>
+            <div class="stat-amount tabular" id="homeIncomeTotal">$0.00</div>
+            <div class="stat-sub" id="homeIncomeCount">0 movimientos</div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-head">
+              <span class="stat-title">Gastos</span>
+              <span class="stat-badge expense" aria-hidden="true">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg>
+              </span>
+            </div>
+            <div class="stat-amount tabular" id="homeExpenseTotal">$0.00</div>
+            <div class="stat-sub tabular" id="homeExpenseBreakdown">Solo gastos diarios</div>
+          </div>
+        </div>
+
+        <!-- Interactive Weekly Calendar Strip -->
+        <div class="card card-tight">
+          <div class="cal-header">
+            <span class="cal-title" id="calWeekTitle">Noviembre 2026</span>
+            <div class="cal-controls">
+              <button type="button" class="pill-toggle active" id="btnFullMonth">Mes completo</button>
+              <button type="button" class="mini-arrow" id="btnPrevWeek" aria-label="Semana anterior">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+              </button>
+              <button type="button" class="mini-arrow" id="btnNextWeek" aria-label="Semana siguiente">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+              </button>
+            </div>
+          </div>
+          <div class="week-grid" id="weekStrip"></div>
+        </div>
+
+        <!-- Movements List -->
+        <div class="section-header">
+          <h2 class="section-title" id="txListHeading">Movimientos del mes</h2>
+          <span class="section-meta" id="txListCount">0 registros</span>
+        </div>
+        <div class="tx-list" id="homeTxList"></div>
+      </section>
+
+      <!-- ================================================================
+           VIEW 2: ANÁLISIS (ESTADÍSTICAS)
+           ================================================================ -->
+      <section class="view" id="view-stats">
+        <header class="top-header">
+          <div>
+            <h1 class="brand-title">Análisis</h1>
+            <span class="brand-sub">Comparativa en tiempo real</span>
+          </div>
+          <div class="month-switcher">
+            <button class="month-btn" data-month-nav="-1" aria-label="Mes anterior">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+            </button>
+            <span class="month-label" data-month-label>Nov 2026</span>
+            <button class="month-btn" data-month-nav="1" aria-label="Mes siguiente">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+            </button>
+          </div>
+        </header>
+
+        <!-- KPI Strip -->
+        <div class="kpi-strip" id="statsKpiStrip"></div>
+
+        <!-- Chart 1: Vertical Bar Chart (Ingresos vs Gastos) -->
+        <div class="card">
+          <div class="chart-header">
+            <h2 class="chart-title">Ingresos vs Gastos</h2>
+            <div class="seg-mini">
+              <button type="button" class="active" data-bar-mode="6m">6 meses</button>
+              <button type="button" data-bar-mode="week">Semanas</button>
+            </div>
+          </div>
+          <div class="chart-readout tabular" id="barReadout"></div>
+          <svg class="bar-chart-svg" id="barChartSvg" viewBox="0 0 340 190" preserveAspectRatio="xMidYMid meet"></svg>
+          <div class="chart-legend-row">
+            <span><i class="legend-dot" style="background: var(--income);"></i>Ingresos</span>
+            <span><i class="legend-dot" style="background: var(--accent-cobalt);"></i>Gastos</span>
+            <span><i class="legend-dot" style="background: var(--expense);"></i>Exceso</span>
+          </div>
+        </div>
+
+        <!-- Chart 2: Donut Chart (Gastos por Categoría) -->
+        <div class="card">
+          <div class="chart-header">
+            <h2 class="chart-title">Gastos por categoría</h2>
+            <span class="section-meta" id="donutMsiNote">Incluye MSI</span>
+          </div>
+          <div class="donut-wrap" id="donutContainer"></div>
+          <div class="rank-list" id="categoryRankList"></div>
+        </div>
+
+        <!-- Breakdown by Payment Method -->
+        <div class="card">
+          <div class="chart-header">
+            <h2 class="chart-title">Gasto por método de pago</h2>
+            <span class="section-meta">Directo + MSI</span>
+          </div>
+          <div class="rank-list" id="methodRankList"></div>
+        </div>
+      </section>
+
+      <!-- ================================================================
+           VIEW 3: MSI (MESES SIN INTERESES)
+           ================================================================ -->
+      <section class="view" id="view-msi">
+        <header class="top-header">
+          <div>
+            <h1 class="brand-title">Meses Sin Intereses</h1>
+            <span class="brand-sub">Avance automático por fecha de corte</span>
+          </div>
+          <div class="month-switcher">
+            <button class="month-btn" data-month-nav="-1" aria-label="Mes anterior">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+            </button>
+            <span class="month-label" data-month-label>Nov 2026</span>
+            <button class="month-btn" data-month-nav="1" aria-label="Mes siguiente">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+            </button>
+          </div>
+        </header>
+
+        <div class="msi-hero">
+          <div class="msi-hero-top">
+            <div>
+              <div class="hero-eyebrow">Pago mensual comprometido</div>
+              <div class="msi-hero-amount tabular" id="msiMonthlyTotal">$0.00</div>
+            </div>
+            <span class="msi-pill" id="msiActiveBadge">0 activos</span>
+          </div>
+          <div class="msi-hero-sub-grid">
+            <div>
+              <div class="brand-sub">Saldo total restante</div>
+              <div class="stat-amount tabular" style="font-size:17px; margin-top:2px;" id="msiRemainingTotal">$0.00</div>
+            </div>
+            <div>
+              <div class="brand-sub">Liquidados</div>
+              <div class="stat-amount tabular" style="font-size:17px; margin-top:2px;" id="msiDoneCount">0 planes</div>
+            </div>
+          </div>
+        </div>
+
+        <button type="button" class="btn btn-primary" id="btnOpenAddMSI" style="margin-bottom: 16px;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Agregar compra a MSI
+        </button>
+
+        <div id="msiActiveList"></div>
+        <div id="msiCompletedSection" class="hidden">
+          <div class="section-header">
+            <h2 class="section-title">Planes liquidados</h2>
+            <span class="section-meta" id="msiCompletedMeta"></span>
+          </div>
+          <div id="msiCompletedList"></div>
+        </div>
+      </section>
+
+      <!-- ================================================================
+           VIEW 4: TARJETAS & AJUSTES
+           ================================================================ -->
+      <section class="view" id="view-cards">
+        <header class="top-header">
+          <div>
+            <h1 class="brand-title">Tarjetas y Ajustes</h1>
+            <span class="brand-sub">Cuentas, categorías y respaldo local</span>
+          </div>
+        </header>
+
+        <!-- Accounts & Cards -->
+        <div class="section-header" style="margin-top: 2px;">
+          <h2 class="section-title">Mis tarjetas y cuentas</h2>
+          <button type="button" class="btn btn-ghost" id="btnAddAccount" style="padding:4px 8px;">+ Nueva</button>
+        </div>
+        <div id="accountsList"></div>
+
+        <!-- Categories Management -->
+        <div class="card" style="margin-top: 14px;">
+          <div class="chart-header" style="margin-bottom: 10px;">
+            <h2 class="chart-title">Mis categorías</h2>
+            <div class="seg-mini">
+              <button type="button" class="active" data-cat-tab="expense">Gastos</button>
+              <button type="button" data-cat-tab="income">Ingresos</button>
+            </div>
+          </div>
+          <div class="cat-manage-grid" id="manageCategoriesList"></div>
+          <button type="button" class="btn btn-secondary" id="btnOpenSettingsNewCat" style="margin-top: 14px; padding: 10px;">
+            + Agregar nueva categoría
+          </button>
+        </div>
+
+        <!-- Local-First Backup & Export -->
+        <div class="card">
+          <div class="chart-header" style="margin-bottom: 12px;">
+            <h2 class="chart-title">Respaldo y Exportación</h2>
+            <span class="section-meta">100% Local</span>
+          </div>
+          <div class="backup-list">
+            <button type="button" class="backup-row" id="btnExportCSV">
+              <div class="backup-row-left">
+                <div class="backup-icon">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="16" y2="17"/></svg>
+                </div>
+                <div>
+                  <div class="backup-title">Exportar historial a CSV</div>
+                  <div class="backup-desc">Compatible con Excel y Google Sheets</div>
+                </div>
+              </div>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#64748B" stroke-width="2.2" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+            </button>
+
+            <button type="button" class="backup-row" id="btnExportJSON">
+              <div class="backup-row-left">
+                <div class="backup-icon">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                </div>
+                <div>
+                  <div class="backup-title">Guardar respaldo completo (JSON)</div>
+                  <div class="backup-desc">Incluye movimientos, MSI, tarjetas y categorías</div>
+                </div>
+              </div>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#64748B" stroke-width="2.2" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+            </button>
+
+            <button type="button" class="backup-row" id="btnImportJSONTrigger">
+              <div class="backup-row-left">
+                <div class="backup-icon">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                </div>
+                <div>
+                  <div class="backup-title">Restaurar respaldo (JSON)</div>
+                  <div class="backup-desc">Importa tus datos desde un archivo guardado</div>
+                </div>
+              </div>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#64748B" stroke-width="2.2" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+            </button>
+            <input type="file" id="inputImportJSON" accept=".json,application/json" class="hidden" />
+
+            <button type="button" class="backup-row" id="btnLoadDemoSettings">
+              <div class="backup-row-left">
+                <div class="backup-icon">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                </div>
+                <div>
+                  <div class="backup-title">Cargar datos de prueba</div>
+                  <div class="backup-desc">Explora gráficas y MSI con ejemplos realistas</div>
+                </div>
+              </div>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#64748B" stroke-width="2.2" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+            </button>
+
+            <button type="button" class="backup-row" id="btnResetAll">
+              <div class="backup-row-left">
+                <div class="backup-icon danger">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>
+                </div>
+                <div>
+                  <div class="backup-title" style="color: var(--expense);">Restablecer todos los datos</div>
+                  <div class="backup-desc">Limpia movimientos y vuelve al estado inicial</div>
+                </div>
+              </div>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#64748B" stroke-width="2.2" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+            </button>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- ====================================================================
+         DOCKED 5-SLOT BOTTOM NAVIGATION BAR
+         ==================================================================== -->
+    <nav class="bottom-nav" aria-label="Navegación principal">
+      <button type="button" class="nav-btn active" data-view="home">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5L12 3l9 7.5"/><path d="M5 9.5V20a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V9.5"/></svg>
+        <span>Inicio</span>
+      </button>
+
+      <button type="button" class="nav-btn" data-view="stats">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+        <span>Análisis</span>
+      </button>
+
+      <div class="fab-slot">
+        <button type="button" class="fab-btn" id="btnFabAdd" aria-label="Registrar movimiento">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.7" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        </button>
+      </div>
+
+      <button type="button" class="nav-btn" data-view="msi">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="3"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><path d="M8 15h.01M12 15h.01M16 15h.01"/></svg>
+        <span>MSI</span>
+      </button>
+
+      <button type="button" class="nav-btn" data-view="cards">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="3"/><line x1="2" y1="10" x2="22" y2="10"/><line x1="6" y1="15" x2="10" y2="15"/></svg>
+        <span>Tarjetas</span>
+      </button>
+    </nav>
+
+    <!-- ====================================================================
+         MODAL 1: QUICK REGISTER / EDIT TRANSACTION BOTTOM SHEET
+         ==================================================================== -->
+    <div class="modal-backdrop" id="modalTx" role="dialog" aria-modal="true" aria-labelledby="modalTxTitle">
+      <div class="sheet">
+        <div class="sheet-handle"></div>
+        <div class="sheet-header">
+          <h2 class="sheet-title" id="modalTxTitle">Nuevo movimiento</h2>
+          <button type="button" class="close-btn" data-close-modal="modalTx" aria-label="Cerrar">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+
+        <form id="txForm" novalidate>
+          <input type="hidden" id="txId" />
+
+          <!-- Segmented Switch: Gasto vs Ingreso -->
+          <div class="segmented-switch">
+            <button type="button" class="seg-btn active-expense" id="btnTypeExpense">Gasto</button>
+            <button type="button" class="seg-btn" id="btnTypeIncome">Ingreso</button>
+          </div>
+
+          <!-- Large Numeric Amount Field -->
+          <div class="amount-input-wrap">
+            <span class="amount-prefix">$</span>
+            <input type="text" inputmode="decimal" autocomplete="off" id="txAmount" class="amount-input" placeholder="0.00" required />
+          </div>
+
+          <!-- Category Chips + Inline "+ Nueva" -->
+          <div class="field-group">
+            <div class="field-label"><span>Categoría</span></div>
+            <div class="chips-grid" id="txCategoryChips"></div>
+
+            <div class="inline-cat-box" id="inlineNewCatBox">
+              <div class="field-label" style="margin-bottom:6px;">
+                <span>Nueva categoría</span>
+                <button type="button" id="btnCancelInlineCat" style="background:none;border:none;color:var(--text-secondary);font-size:12px;cursor:pointer;">Cancelar</button>
+              </div>
+              <input type="text" id="inlineCatName" class="text-input" placeholder="Nombre (ej. Salud, Mascotas)" maxlength="26" />
+              <div class="emoji-picker" id="inlineEmojiPicker"></div>
+              <button type="button" class="btn btn-primary btn-sm" id="btnSaveInlineCat" style="width:100%;">Crear categoría</button>
+            </div>
+          </div>
+
+          <!-- Payment Method Chips -->
+          <div class="field-group">
+            <div class="field-label"><span>Método de pago</span></div>
+            <div class="chips-grid" id="txMethodChips"></div>
+          </div>
+
+          <!-- Concept & Date -->
+          <div class="two-col-fields">
+            <div class="field-group">
+              <label class="field-label" for="txConcept">Concepto (opcional)</label>
+              <input type="text" id="txConcept" class="text-input" placeholder="Ej. Café, Uber..." maxlength="60" />
+            </div>
+            <div class="field-group">
+              <label class="field-label" for="txDate">Fecha</label>
+              <input type="date" id="txDate" class="text-input" required />
+            </div>
+          </div>
+
+          <div style="display:flex; flex-direction:column; gap:9px; margin-top:6px;">
+            <button type="submit" class="btn btn-primary" id="btnSubmitTx">Guardar movimiento</button>
+            <button type="button" class="btn btn-danger hidden" id="btnDeleteTx">Eliminar movimiento</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- ====================================================================
+         MODAL 2: ADD / EDIT MSI BOTTOM SHEET
+         ==================================================================== -->
+    <div class="modal-backdrop" id="modalMSI" role="dialog" aria-modal="true" aria-labelledby="modalMSITitle">
+      <div class="sheet">
+        <div class="sheet-handle"></div>
+        <div class="sheet-header">
+          <h2 class="sheet-title" id="modalMSITitle">Nueva compra a MSI</h2>
+          <button type="button" class="close-btn" data-close-modal="modalMSI" aria-label="Cerrar">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+
+        <form id="msiForm" novalidate>
+          <input type="hidden" id="msiId" />
+
+          <div class="field-group">
+            <label class="field-label" for="msiConcept">Concepto de la compra</label>
+            <input type="text" id="msiConcept" class="text-input" placeholder="Ej. Laptop, Vuelo, Lentes..." maxlength="50" required />
+          </div>
+
+          <div class="field-group">
+            <label class="field-label" for="msiTotalAmount">Monto total de la compra (MXN)</label>
+            <input type="text" inputmode="decimal" autocomplete="off" id="msiTotalAmount" class="text-input tabular" placeholder="Ej. 12000" required />
+          </div>
+
+          <div class="field-group">
+            <div class="field-label"><span>Plazo total (meses)</span></div>
+            <div class="chips-grid" id="msiTermChips" style="margin-bottom:8px;">
+              <button type="button" class="chip" data-term="3">3 m</button>
+              <button type="button" class="chip" data-term="6">6 m</button>
+              <button type="button" class="chip" data-term="9">9 m</button>
+              <button type="button" class="chip selected" data-term="12">12 m</button>
+              <button type="button" class="chip" data-term="18">18 m</button>
+              <button type="button" class="chip" data-term="24">24 m</button>
+            </div>
+            <div class="two-col-fields">
+              <div>
+                <label class="field-label" for="msiTotalMonths">Meses totales</label>
+                <input type="number" id="msiTotalMonths" class="text-input tabular" min="2" max="60" value="12" required />
+              </div>
+              <div>
+                <label class="field-label" for="msiCurrentInstallment">Pago actual en el que vas</label>
+                <input type="number" id="msiCurrentInstallment" class="text-input tabular" min="1" max="60" value="1" required />
+              </div>
+            </div>
+          </div>
+
+          <div class="field-group">
+            <label class="field-label" for="msiCardSelect">Tarjeta de crédito asociada</label>
+            <select id="msiCardSelect" class="select-input" required></select>
+          </div>
+
+          <div class="preview-banner tabular" id="msiLivePreview">
+            <span>Mensualidad estimada</span>
+            <strong id="msiMonthlyPreview">$0.00 / mes</strong>
+          </div>
+
+          <div style="display:flex; flex-direction:column; gap:9px;">
+            <button type="submit" class="btn btn-primary" id="btnSubmitMSI">Guardar compra a MSI</button>
+            <button type="button" class="btn btn-danger hidden" id="btnDeleteMSI">Eliminar compra a MSI</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- ====================================================================
+         MODAL 3: ADD / EDIT ACCOUNT OR CARD BOTTOM SHEET
+         ==================================================================== -->
+    <div class="modal-backdrop" id="modalAccount" role="dialog" aria-modal="true" aria-labelledby="modalAccountTitle">
+      <div class="sheet">
+        <div class="sheet-handle"></div>
+        <div class="sheet-header">
+          <h2 class="sheet-title" id="modalAccountTitle">Editar tarjeta / cuenta</h2>
+          <button type="button" class="close-btn" data-close-modal="modalAccount" aria-label="Cerrar">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+
+        <form id="accountForm" novalidate>
+          <input type="hidden" id="accId" />
+
+          <div class="field-group">
+            <label class="field-label" for="accName">Nombre de la tarjeta o cuenta</label>
+            <input type="text" id="accName" class="text-input" placeholder="Ej. Nu Crédito, Santander..." maxlength="36" required />
+          </div>
+
+          <div class="field-group">
+            <label class="field-label" for="accType">Tipo de cuenta</label>
+            <select id="accType" class="select-input">
+              <option value="credit">Tarjeta de crédito</option>
+              <option value="debit">Tarjeta de débito</option>
+              <option value="cash">Efectivo</option>
+            </select>
+          </div>
+
+          <div class="two-col-fields" id="accCreditFields">
+            <div class="field-group">
+              <label class="field-label" for="accCutoffDay">Día de corte (1–31)</label>
+              <input type="number" id="accCutoffDay" class="text-input tabular" min="1" max="31" value="15" />
+            </div>
+            <div class="field-group">
+              <label class="field-label" for="accDueDay">Día límite de pago (1–31)</label>
+              <input type="number" id="accDueDay" class="text-input tabular" min="1" max="31" value="5" />
+            </div>
+          </div>
+
+          <div class="field-group">
+            <div class="field-label"><span>Color identificador</span></div>
+            <div class="color-swatches" id="accColorSwatches"></div>
+          </div>
+
+          <div style="display:flex; flex-direction:column; gap:9px; margin-top:8px;">
+            <button type="submit" class="btn btn-primary">Guardar cambios</button>
+            <button type="button" class="btn btn-danger hidden" id="btnDeleteAccount">Eliminar cuenta</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- ====================================================================
+         MODAL 4: ADD CATEGORY FROM SETTINGS
+         ==================================================================== -->
+    <div class="modal-backdrop" id="modalCategory" role="dialog" aria-modal="true" aria-labelledby="modalCatTitle">
+      <div class="sheet">
+        <div class="sheet-handle"></div>
+        <div class="sheet-header">
+          <h2 class="sheet-title" id="modalCatTitle">Nueva categoría</h2>
+          <button type="button" class="close-btn" data-close-modal="modalCategory" aria-label="Cerrar">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+        <form id="settingsCatForm" novalidate>
+          <div class="field-group">
+            <label class="field-label" for="settingsCatName">Nombre</label>
+            <input type="text" id="settingsCatName" class="text-input" placeholder="Ej. Salud, Gimnasio, Café..." maxlength="26" required />
+          </div>
+          <div class="field-group">
+            <div class="field-label"><span>Ícono</span></div>
+            <div class="emoji-picker" id="settingsEmojiPicker"></div>
+          </div>
+          <button type="submit" class="btn btn-primary" style="margin-top:6px;">Agregar categoría</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- ====================================================================
+         MODAL 5: QUICK EXPORT / BACKUP SHEET (from Home Header)
+         ==================================================================== -->
+    <div class="modal-backdrop" id="modalQuickExport" role="dialog" aria-modal="true">
+      <div class="sheet">
+        <div class="sheet-handle"></div>
+        <div class="sheet-header">
+          <h2 class="sheet-title">Respaldo rápido</h2>
+          <button type="button" class="close-btn" data-close-modal="modalQuickExport" aria-label="Cerrar">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+        <p style="font-size:13px; color:var(--text-secondary); margin-bottom:14px;">
+          Tus datos viven 100% en este dispositivo para abrir al instante sin internet. Exporta una copia cuando lo desees:
+        </p>
+        <div style="display:flex; flex-direction:column; gap:10px;">
+          <button type="button" class="btn btn-primary" id="btnQuickCSV">Exportar movimientos en CSV (Excel)</button>
+          <button type="button" class="btn btn-secondary" id="btnQuickJSON">Descargar respaldo completo (JSON)</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ====================================================================
+         CUSTOM IN-APP CONFIRMATION DIALOG (Zero native alert/confirm)
+         ==================================================================== -->
+    <div class="modal-backdrop dialog-backdrop" id="modalConfirm" role="alertdialog" aria-modal="true">
+      <div class="dialog-box">
+        <h3 class="dialog-title" id="confirmTitle">Confirmar acción</h3>
+        <p class="dialog-msg" id="confirmMsg"></p>
+        <div class="dialog-actions">
+          <button type="button" class="btn btn-secondary" id="btnConfirmCancel">Cancelar</button>
+          <button type="button" class="btn btn-primary" id="btnConfirmOk">Confirmar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /* ========================================================================
+       INTERAMB — LOCAL-FIRST PERSONAL FINANCE ENGINE (PURE VANILLA JS)
+       Storage Key: "interamb_data_v1"
+       ======================================================================== */
+    (function () {
+      "use strict";
+
+      const STORAGE_KEY = "interamb_data_v1";
+
+      const MONTHS_SHORT = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"];
+      const MONTHS_LONG = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+      const WEEKDAYS_SHORT = ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"];
+
+      const EMOJI_CHOICES = [
+        "🚇", "🍽️", "🏠", "🎬", "⚡", "🎁", "☕", "💊",
+        "🛒", "👕", "🐾", "✈️", "📚", "🏋️", "📱", "⛽",
+        "💵", "💼", "🎓", "🔄", "📈", "🪙", "🛠️", "🎉"
+      ];
+
+      const CARD_COLORS = [
+        "#2563EB", "#38BDF8", "#6366F1", "#0EA5E9",
+        "#10B981", "#8B5CF6", "#F59E0B", "#EC4899"
+      ];
+
+      const DONUT_COLORS = [
+        "#38BDF8", "#3B82F6", "#6366F1", "#818CF8",
+        "#2DD4BF", "#A78BFA", "#F472B6", "#FBBF24", "#FB7185"
+      ];
+
+      /* ----------------------------------------------------------------------
+         DEFAULT INITIAL DATA (Preloaded Accounts & Categories)
+         ---------------------------------------------------------------------- */
+      function createDefaultData() {
+        return {
+          accounts: [
+            { id: "acc_cash", name: "Efectivo", type: "cash", color: "#10B981" },
+            { id: "acc_bbva_deb", name: "BBVA Débito", type: "debit", color: "#38BDF8" },
+            { id: "acc_bbva_cred", name: "BBVA Crédito", type: "credit", color: "#2563EB", cutoffDay: 15, dueDay: 5 },
+            { id: "acc_citi_cred", name: "Citibanamex Crédito", type: "credit", color: "#6366F1", cutoffDay: 20, dueDay: 10 },
+            { id: "acc_mp_cred", name: "Mercado Pago Crédito", type: "credit", color: "#0EA5E9", cutoffDay: 10, dueDay: 25 }
+          ],
+          categories: {
+            expense: [
+              { id: "cat_exp_transporte", name: "Transporte", emoji: "🚇", builtIn: true },
+              { id: "cat_exp_alimento", name: "Alimento", emoji: "🍽️", builtIn: true },
+              { id: "cat_exp_necesidades", name: "Necesidades", emoji: "🏠", builtIn: true },
+              { id: "cat_exp_entretenimiento", name: "Entretenimiento", emoji: "🎬", builtIn: true },
+              { id: "cat_exp_suscripciones", name: "Suscripciones y servicios", emoji: "⚡", builtIn: true },
+              { id: "cat_exp_regalos", name: "Regalos", emoji: "🎁", builtIn: true }
+            ],
+            income: [
+              { id: "cat_inc_general", name: "Ingreso general", emoji: "💵", builtIn: true },
+              { id: "cat_inc_trabajo", name: "Trabajo / Proyectos", emoji: "💼", builtIn: true },
+              { id: "cat_inc_beca", name: "Beca / Apoyo", emoji: "🎓", builtIn: true },
+              { id: "cat_inc_otros", name: "Otros ingresos", emoji: "🔄", builtIn: true }
+            ]
+          },
+          transactions: [],
+          msiPlans: [],
+          settings: {
+            includeMSI: true
+          }
+        };
+      }
+
+      /* ----------------------------------------------------------------------
+         STORAGE & APPLICATION STATE
+         ---------------------------------------------------------------------- */
+      function loadData() {
+        try {
+          const raw = localStorage.getItem(STORAGE_KEY);
+          if (!raw) return createDefaultData();
+          const parsed = JSON.parse(raw);
+          const def = createDefaultData();
+          return {
+            accounts: Array.isArray(parsed.accounts) && parsed.accounts.length ? parsed.accounts : def.accounts,
+            categories: {
+              expense: parsed.categories && Array.isArray(parsed.categories.expense) && parsed.categories.expense.length
+                ? parsed.categories.expense : def.categories.expense,
+              income: parsed.categories && Array.isArray(parsed.categories.income) && parsed.categories.income.length
+                ? parsed.categories.income : def.categories.income
+            },
+            transactions: Array.isArray(parsed.transactions) ? parsed.transactions : [],
+            msiPlans: Array.isArray(parsed.msiPlans) ? parsed.msiPlans : [],
+            settings: {
+              includeMSI: parsed.settings && typeof parsed.settings.includeMSI === "boolean" ? parsed.settings.includeMSI : true
+            }
+          };
+        } catch (err) {
+          console.warn("LocalStorage unavailable, running in memory:", err);
+          return createDefaultData();
+        }
+      }
+
+      function saveData() {
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(db));
+        } catch (err) {
+          showToast("No se pudo guardar localmente (almacenamiento restringido)");
+        }
+      }
+
+      let db = loadData();
+
+      const now = new Date();
+      const ui = {
+        activeView: "home",
+        viewYear: now.getFullYear(),
+        viewMonth: now.getMonth(), // 0-11
+        selectedDateStr: toISODate(now),
+        weekAnchorDate: new Date(now.getFullYear(), now.getMonth(), now.getDate()),
+        fullMonthMode: true,
+        barMode: "6m", // "6m" | "week"
+        selectedBarIndex: null,
+        selectedDonutId: null,
+        manageCatType: "expense",
+        // Tx Modal state
+        txType: "expense",
+        txCategoryId: null,
+        txAccountId: null,
+        inlineCatEmoji: "🛒",
+        settingsCatEmoji: "💊",
+        accColor: "#2563EB",
+        confirmCallback: null
+      };
+
+      /* ----------------------------------------------------------------------
+         DATE & FORMATTING UTILITIES
+         ---------------------------------------------------------------------- */
+      function pad2(n) {
+        return String(n).padStart(2, "0");
+      }
+
+      function toISODate(d) {
+        return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`;
+      }
+
+      function parseISODate(str) {
+        const parts = String(str || "").split("-").map(Number);
+        if (parts.length !== 3 || parts.some(isNaN)) return new Date();
+        return new Date(parts[0], parts[1] - 1, parts[2]);
+      }
+
+      function daysInMonth(year, month) {
+        return new Date(year, month + 1, 0).getDate();
+      }
+
+      function formatMXN(value, compact = false) {
+        const num = Number(value) || 0;
+        if (compact && Math.abs(num) >= 1000) {
+          const k = num / 1000;
+          return (num < 0 ? "-$" : "$") + (Math.abs(k) >= 10 ? Math.round(Math.abs(k)) : Math.abs(k).toFixed(1)) + "k";
+        }
+        try {
+          return new Intl.NumberFormat("es-MX", {
+            style: "currency",
+            currency: "MXN",
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+          }).format(num);
+        } catch (_) {
+          const sign = num < 0 ? "-" : "";
+          return sign + "$" + Math.abs(num).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        }
+      }
+
+      function formatShortDate(isoStr) {
+        const d = parseISODate(isoStr);
+        return `${d.getDate()} ${MONTHS_SHORT[d.getMonth()]}`;
+      }
+
+      function parseAmountInput(raw) {
+        const cleaned = String(raw || "").replace(/[^0-9.]/g, "");
+        const num = parseFloat(cleaned);
+        return isNaN(num) ? 0 : Math.round(num * 100) / 100;
+      }
+
+      function uid(prefix) {
+        return `${prefix}_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 7)}`;
+      }
+
+      function escapeHtml(str) {
+        return String(str || "")
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;")
+          .replace(/'/g, "&#39;");
+      }
+
+      /* ----------------------------------------------------------------------
+         CUTOFF-DRIVEN MSI ENGINE & CREDIT CARD COUNTDOWNS
+         ---------------------------------------------------------------------- */
+      function getEvalDateForMonth(year, month) {
+        const today = new Date();
+        const todayClean = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+        if (year === todayClean.getFullYear() && month === todayClean.getMonth()) {
+          return todayClean;
+        }
+        return new Date(year, month, daysInMonth(year, month));
+      }
+
+      /**
+       * Counts how many monthly cutoff dates (clamped to valid day of month)
+       * fall strictly after startDate and on or before endDate: (startDate, endDate].
+       * Works both forward (endDate > startDate) and backward (endDate < startDate).
+       */
+      function countCutoffsBetween(cutoffDay, startDate, endDate) {
+        const s = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate());
+        const e = new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate());
+        if (s.getTime() === e.getTime()) return 0;
+
+        const sign = e > s ? 1 : -1;
+        const from = sign > 0 ? s : e;
+        const to = sign > 0 ? e : s;
+
+        let count = 0;
+        let y = from.getFullYear();
+        let m = from.getMonth();
+        const endY = to.getFullYear();
+        const endM = to.getMonth();
+
+        while (y < endY || (y === endY && m <= endM)) {
+          const day = Math.min(Math.max(1, Number(cutoffDay) || 1), daysInMonth(y, m));
+          const cutDate = new Date(y, m, day);
+          if (cutDate > from && cutDate <= to) {
+            count++;
+          }
+          m++;
+          if (m > 11) { m = 0; y++; }
+        }
+        return count * sign;
+      }
+
+      function getNextCutoffDate(cutoffDay, afterDate) {
+        const base = new Date(afterDate.getFullYear(), afterDate.getMonth(), afterDate.getDate());
+        let y = base.getFullYear();
+        let m = base.getMonth();
+        let day = Math.min(Math.max(1, Number(cutoffDay) || 1), daysInMonth(y, m));
+        let candidate = new Date(y, m, day);
+        if (candidate <= base) {
+          m++;
+          if (m > 11) { m = 0; y++; }
+          day = Math.min(Math.max(1, Number(cutoffDay) || 1), daysInMonth(y, m));
+          candidate = new Date(y, m, day);
+        }
+        return candidate;
+      }
+
+      function getDaysUntilCutoff(cutoffDay) {
+        const today = new Date();
+        const todayClean = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+        let y = todayClean.getFullYear();
+        let m = todayClean.getMonth();
+        let day = Math.min(Math.max(1, Number(cutoffDay) || 1), daysInMonth(y, m));
+        let nextCut = new Date(y, m, day);
+        if (nextCut < todayClean) {
+          m++;
+          if (m > 11) { m = 0; y++; }
+          day = Math.min(Math.max(1, Number(cutoffDay) || 1), daysInMonth(y, m));
+          nextCut = new Date(y, m, day);
+        }
+        return Math.round((nextCut - todayClean) / 86400000);
+      }
+
+      function computeMSIStatus(plan, year, month) {
+        const card = db.accounts.find(a => a.id === plan.cardId);
+        const cutoffDay = (card && card.cutoffDay) ? card.cutoffDay : 1;
+        const evalDate = getEvalDateForMonth(year, month);
+        const refDate = parseISODate(plan.referenceDate);
+
+        const elapsedCutoffs = countCutoffsBetween(cutoffDay, refDate, evalDate);
+        const rawInstallment = Number(plan.baseInstallment) + elapsedCutoffs;
+        const totalMonths = Math.max(1, Number(plan.totalMonths));
+        const monthlyPayment = Number(plan.totalAmount) / totalMonths;
+
+        let status = "active";
+        let displayInstallment = rawInstallment;
+        if (rawInstallment < 1) {
+          status = "upcoming";
+          displayInstallment = 0;
+        } else if (rawInstallment > totalMonths) {
+          status = "completed";
+          displayInstallment = totalMonths;
+        }
+
+        const activeCharge = status === "active" ? monthlyPayment : 0;
+        const remainingPayments = status === "completed"
+          ? 0
+          : (status === "upcoming" ? totalMonths : Math.max(0, totalMonths - displayInstallment));
+        const remainingAmount = remainingPayments * monthlyPayment;
+        const nextAdvanceDate = status !== "completed" ? getNextCutoffDate(cutoffDay, evalDate) : null;
+
+        return {
+          plan,
+          card,
+          cutoffDay,
+          status,
+          currentInstallment: displayInstallment,
+          totalMonths,
+          monthlyPayment,
+          activeCharge,
+          remainingPayments,
+          remainingAmount,
+          progressPct: Math.min(100, Math.max(0, (displayInstallment / totalMonths) * 100)),
+          nextAdvanceDate
+        };
+      }
+
+      /* ----------------------------------------------------------------------
+         MONTHLY METRICS AGGREGATION
+         ---------------------------------------------------------------------- */
+      function getMonthTransactions(year, month) {
+        const prefix = `${year}-${pad2(month + 1)}-`;
+        return db.transactions
+          .filter(t => t.date && t.date.startsWith(prefix))
+          .sort((a, b) => {
+            if (b.date !== a.date) return b.date.localeCompare(a.date);
+            return (b.createdAt || 0) - (a.createdAt || 0);
+          });
+      }
+
+      function getMonthSummary(year, month, includeMSI = db.settings.includeMSI) {
+        const txs = getMonthTransactions(year, month);
+        let income = 0;
+        let directExpense = 0;
+        let incomeCount = 0;
+        let expenseCount = 0;
+
+        for (const tx of txs) {
+          const amt = Number(tx.amount) || 0;
+          if (tx.type === "income") {
+            income += amt;
+            incomeCount++;
+          } else {
+            directExpense += amt;
+            expenseCount++;
+          }
+        }
+
+        const msiStatuses = db.msiPlans.map(p => computeMSIStatus(p, year, month));
+        const msiMonthly = msiStatuses.reduce((sum, s) => sum + s.activeCharge, 0);
+        const totalExpense = directExpense + (includeMSI ? msiMonthly : 0);
+        const netBalance = income - totalExpense;
+        const spentPct = income > 0 ? (totalExpense / income) * 100 : null;
+
+        return {
+          txs,
+          income,
+          directExpense,
+          msiMonthly,
+          totalExpense,
+          netBalance,
+          spentPct,
+          incomeCount,
+          expenseCount,
+          msiStatuses
+        };
+      }
+
+      function findCategory(type, id) {
+        const list = db.categories[type] || [];
+        return list.find(c => c.id === id) || { id, name: "Sin categoría", emoji: type === "income" ? "💵" : "🏷️" };
+      }
+
+      function findAccount(id) {
+        return db.accounts.find(a => a.id === id) || { id, name: "Cuenta eliminada", type: "cash", color: "#64748B" };
+      }
+
+      /* ----------------------------------------------------------------------
+         PWA DYNAMIC MANIFEST & APPLE TOUCH ICON (ZERO EXTERNAL FILES)
+         ---------------------------------------------------------------------- */
+      function setupOfflinePWA() {
+        try {
+          const size = 180;
+          const canvas = document.createElement("canvas");
+          canvas.width = size;
+          canvas.height = size;
+          const ctx = canvas.getContext("2d");
+
+          // Deep navy gradient background
+          const grad = ctx.createLinearGradient(0, 0, size, size);
+          grad.addColorStop(0, "#0A1733");
+          grad.addColorStop(1, "#1D4ED8");
+          ctx.fillStyle = grad;
+          ctx.fillRect(0, 0, size, size);
+
+          // Glowing ring
+          ctx.beginPath();
+          ctx.arc(size / 2, size / 2, 54, -Math.PI / 2, Math.PI * 1.15);
+          ctx.strokeStyle = "#38BDF8";
+          ctx.lineWidth = 14;
+          ctx.lineCap = "round";
+          ctx.stroke();
+
+          ctx.beginPath();
+          ctx.arc(size / 2, size / 2, 54, Math.PI * 1.32, Math.PI * 1.48);
+          ctx.strokeStyle = "#34D399";
+          ctx.lineWidth = 14;
+          ctx.lineCap = "round";
+          ctx.stroke();
+
+          // Center "I" bar
+          ctx.fillStyle = "#FFFFFF";
+          ctx.beginPath();
+          ctx.roundRect(size / 2 - 9, size / 2 - 26, 18, 52, 9);
+          ctx.fill();
+
+          const iconUri = canvas.toDataURL("image/png");
+
+          const appleLink = document.createElement("link");
+          appleLink.rel = "apple-touch-icon";
+          appleLink.href = iconUri;
+          document.head.appendChild(appleLink);
+
+          const manifest = {
+            name: "Interamb · Finanzas Personales",
+            short_name: "Interamb",
+            description: "Control local-first de gastos diarios, ingresos y Meses Sin Intereses.",
+            start_url: ".",
+            display: "standalone",
+            background_color: "#060B16",
+            theme_color: "#060B16",
+            orientation: "portrait",
+            icons: [
+              { src: iconUri, sizes: "180x180", type: "image/png", purpose: "any maskable" }
+            ]
+          };
+
+          const manifestBlob = new Blob([JSON.stringify(manifest)], { type: "application/manifest+json" });
+          const manifestUrl = URL.createObjectURL(manifestBlob);
+          const manLink = document.createElement("link");
+          manLink.rel = "manifest";
+          manLink.href = manifestUrl;
+          document.head.appendChild(manLink);
+        } catch (e) {
+          // Graceful skip if restricted environment
+        }
+      }
+
+      /* ----------------------------------------------------------------------
+         UI HELPERS (Toast, Modals, Confirmations)
+         ---------------------------------------------------------------------- */
+      let toastTimer = null;
+      function showToast(msg) {
+        const el = document.getElementById("toast");
+        el.textContent = msg;
+        el.classList.add("show");
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => el.classList.remove("show"), 2600);
+      }
+
+      function openModal(id) {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.classList.add("open");
+      }
+
+      function closeModal(id) {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.classList.remove("open");
+      }
+
+      function showConfirm(title, message, onConfirm, isDanger = false, okLabel = "Confirmar") {
+        document.getElementById("confirmTitle").textContent = title;
+        document.getElementById("confirmMsg").textContent = message;
+        const okBtn = document.getElementById("btnConfirmOk");
+        okBtn.textContent = okLabel;
+        okBtn.className = isDanger ? "btn btn-danger" : "btn btn-primary";
+        ui.confirmCallback = onConfirm;
+        openModal("modalConfirm");
+      }
+
+      /* ----------------------------------------------------------------------
+         RENDERING: COMMON & HEADER
+         ---------------------------------------------------------------------- */
+      function updateMonthLabels() {
+        const shortLabel = `${MONTHS_SHORT[ui.viewMonth]} ${ui.viewYear}`;
+        document.querySelectorAll("[data-month-label]").forEach(el => {
+          el.textContent = shortLabel;
+        });
+
+        const today = new Date();
+        document.getElementById("homeTodayLabel").textContent =
+          `${WEEKDAYS_SHORT[today.getDay()]}, ${today.getDate()} ${MONTHS_SHORT[today.getMonth()]}`;
+      }
+
+      function renderAll() {
+        updateMonthLabels();
+        renderHome();
+        if (ui.activeView === "stats") renderStats();
+        if (ui.activeView === "msi") renderMSI();
+        if (ui.activeView === "cards") renderCardsView();
+      }
+
+      /* ----------------------------------------------------------------------
+         RENDERING: VIEW 1 (INICIO / HOME)
+         ---------------------------------------------------------------------- */
+      function renderHome() {
+        const summary = getMonthSummary(ui.viewYear, ui.viewMonth, db.settings.includeMSI);
+
+        // Hero Balance
+        const balEl = document.getElementById("heroBalance");
+        balEl.textContent = formatMXN(summary.netBalance);
+        balEl.classList.toggle("negative", summary.netBalance < 0);
+
+        // MSI Toggle Pill
+        const msiPill = document.getElementById("btnToggleMSI");
+        msiPill.classList.toggle("active", db.settings.includeMSI);
+
+        // Hero Progress Ring (r = 41 => C = 2 * PI * 41 = 257.61)
+        const C = 257.61;
+        const ringFg = document.getElementById("heroRingFg");
+        const ringPct = document.getElementById("heroRingPct");
+        const ringLabel = document.getElementById("heroRingLabel");
+
+        if (summary.income <= 0) {
+          if (summary.totalExpense > 0) {
+            ringFg.style.strokeDashoffset = "0";
+            ringFg.style.stroke = "#FB7185";
+            ringPct.textContent = "—";
+            ringLabel.textContent = "Sin ingresos";
+          } else {
+            ringFg.style.strokeDashoffset = String(C);
+            ringFg.style.stroke = "#38BDF8";
+            ringPct.textContent = "0%";
+            ringLabel.textContent = "Sin datos";
+          }
+        } else {
+          const pct = Math.round(summary.spentPct);
+          const clamped = Math.min(100, Math.max(0, summary.spentPct));
+          ringFg.style.strokeDashoffset = String(C * (1 - clamped / 100));
+          ringFg.style.stroke = summary.spentPct > 100 ? "#FB7185" : (summary.spentPct > 85 ? "#FBBF24" : "#38BDF8");
+          ringPct.textContent = `${pct}%`;
+          ringLabel.textContent = summary.spentPct > 100 ? "excedido" : "gastado";
+        }
+
+        // 2-Column Summary Cards
+        document.getElementById("homeIncomeTotal").textContent = formatMXN(summary.income);
+        document.getElementById("homeIncomeCount").textContent =
+          `${summary.incomeCount} ${summary.incomeCount === 1 ? "ingreso" : "ingresos"}`;
+
+        document.getElementById("homeExpenseTotal").textContent = formatMXN(summary.totalExpense);
+        const expSub = document.getElementById("homeExpenseBreakdown");
+        if (db.settings.includeMSI && summary.msiMonthly > 0) {
+          expSub.textContent = `Diarios ${formatMXN(summary.directExpense, true)} + MSI ${formatMXN(summary.msiMonthly, true)}`;
+        } else {
+          expSub.textContent = `${summary.expenseCount} ${summary.expenseCount === 1 ? "gasto diario" : "gastos diarios"}`;
+        }
+
+        // Weekly Calendar Strip
+        renderWeekStrip();
+
+        // Movements List
+        const listEl = document.getElementById("homeTxList");
+        const headingEl = document.getElementById("txListHeading");
+        const countEl = document.getElementById("txListCount");
+
+        const filteredTxs = ui.fullMonthMode
+          ? summary.txs
+          : db.transactions
+              .filter(t => t.date === ui.selectedDateStr)
+              .sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+
+        if (ui.fullMonthMode) {
+          headingEl.textContent = `Movimientos de ${MONTHS_LONG[ui.viewMonth]}`;
+        } else {
+          const selD = parseISODate(ui.selectedDateStr);
+          headingEl.textContent = `Movimientos · ${WEEKDAYS_SHORT[selD.getDay()]} ${selD.getDate()} ${MONTHS_SHORT[selD.getMonth()]}`;
+        }
+        countEl.textContent = `${filteredTxs.length} ${filteredTxs.length === 1 ? "registro" : "registros"}`;
+
+        if (filteredTxs.length === 0) {
+          const hasAnyGlobal = db.transactions.length > 0;
+          listEl.innerHTML = `
+            <div class="empty-state">
+              <div class="empty-emoji">${hasAnyGlobal ? "📅" : "✨"}</div>
+              <div class="empty-title">${hasAnyGlobal ? "Sin movimientos en este periodo" : "Empieza a registrar tu día"}</div>
+              <div class="empty-desc">
+                ${hasAnyGlobal
+                  ? "Toca el botón + para anotar un gasto o ingreso en segundos."
+                  : "Anota gastos, ingresos y tus compras a MSI para ver tu balance y gráficas en tiempo real."}
+              </div>
+              <div class="empty-actions">
+                <button type="button" class="btn btn-primary" id="btnEmptyAddTx">+ Registrar primer movimiento</button>
+                ${!hasAnyGlobal ? `<button type="button" class="btn btn-ghost" id="btnEmptyLoadDemo">Cargar datos de prueba</button>` : ""}
+              </div>
+            </div>
+          `;
+          const addBtn = document.getElementById("btnEmptyAddTx");
+          if (addBtn) addBtn.addEventListener("click", () => openTxModal());
+          const demoBtn = document.getElementById("btnEmptyLoadDemo");
+          if (demoBtn) demoBtn.addEventListener("click", promptLoadDemoData);
+          return;
+        }
+
+        listEl.innerHTML = filteredTxs.map(tx => {
+          const cat = findCategory(tx.type, tx.categoryId);
+          const acc = findAccount(tx.accountId);
+          const title = tx.concept && tx.concept.trim() ? tx.concept.trim() : cat.name;
+          const subtitleCat = tx.concept && tx.concept.trim() ? `<span>${escapeHtml(cat.name)}</span><span>·</span>` : "";
+          const sign = tx.type === "income" ? "+" : "-";
+          return `
+            <div class="tx-item" data-tx-id="${escapeHtml(tx.id)}">
+              <div class="tx-icon">${escapeHtml(cat.emoji)}</div>
+              <div class="tx-body">
+                <div class="tx-title">${escapeHtml(title)}</div>
+                <div class="tx-meta">
+                  ${subtitleCat}
+                  <span class="method-tag">
+                    <span class="method-dot" style="background:${escapeHtml(acc.color)}"></span>
+                    ${escapeHtml(acc.name)}
+                  </span>
+                  <span>${formatShortDate(tx.date)}</span>
+                </div>
+              </div>
+              <div class="tx-amount tabular ${tx.type}">${sign}${formatMXN(tx.amount)}</div>
+            </div>
+          `;
+        }).join("");
+
+        listEl.querySelectorAll(".tx-item").forEach(item => {
+          item.addEventListener("click", () => {
+            const tx = db.transactions.find(t => t.id === item.dataset.txId);
+            if (tx) openTxModal(tx);
+          });
+        });
+      }
+
+      function renderWeekStrip() {
+        const anchor = new Date(ui.weekAnchorDate.getFullYear(), ui.weekAnchorDate.getMonth(), ui.weekAnchorDate.getDate());
+        const startOfWeek = new Date(anchor);
+        startOfWeek.setDate(anchor.getDate() - anchor.getDay()); // Sunday
+
+        const midWeek = new Date(startOfWeek);
+        midWeek.setDate(startOfWeek.getDate() + 3);
+        document.getElementById("calWeekTitle").textContent = `${MONTHS_LONG[midWeek.getMonth()]} ${midWeek.getFullYear()}`;
+
+        const fullBtn = document.getElementById("btnFullMonth");
+        fullBtn.classList.toggle("active", ui.fullMonthMode);
+
+        // Index transactions by date for subtle indicator dots
+        const dayMap = {};
+        for (const tx of db.transactions) {
+          if (!dayMap[tx.date]) dayMap[tx.date] = { inc: false, exp: false };
+          if (tx.type === "income") dayMap[tx.date].inc = true;
+          else dayMap[tx.date].exp = true;
+        }
+
+        const todayStr = toISODate(new Date());
+        const strip = document.getElementById("weekStrip");
+        let html = "";
+
+        for (let i = 0; i < 7; i++) {
+          const d = new Date(startOfWeek);
+          d.setDate(startOfWeek.getDate() + i);
+          const iso = toISODate(d);
+          const isSelected = !ui.fullMonthMode && iso === ui.selectedDateStr;
+          const isToday = iso === todayStr;
+          const isOtherMonth = d.getMonth() !== ui.viewMonth;
+          const flags = dayMap[iso] || { inc: false, exp: false };
+
+          html += `
+            <div class="day-cell ${isSelected ? "selected" : ""} ${isToday ? "today" : ""} ${isOtherMonth ? "other-month" : ""}" data-date="${iso}">
+              <span class="day-wd">${WEEKDAYS_SHORT[i]}</span>
+              <span class="day-num tabular">${pad2(d.getDate())}</span>
+              <div class="day-dots">
+                ${flags.inc ? '<span class="day-dot inc"></span>' : ""}
+                ${flags.exp ? '<span class="day-dot exp"></span>' : ""}
+              </div>
+            </div>
+          `;
+        }
+
+        strip.innerHTML = html;
+        strip.querySelectorAll(".day-cell").forEach(cell => {
+          cell.addEventListener("click", () => {
+            const clickedDate = cell.dataset.date;
+            if (!ui.fullMonthMode && ui.selectedDateStr === clickedDate) {
+              ui.fullMonthMode = true;
+            } else {
+              ui.selectedDateStr = clickedDate;
+              ui.fullMonthMode = false;
+              const d = parseISODate(clickedDate);
+              ui.viewYear = d.getFullYear();
+              ui.viewMonth = d.getMonth();
+            }
+            renderAll();
+          });
+        });
+      }
+
+      /* ----------------------------------------------------------------------
+         RENDERING: VIEW 2 (ANÁLISIS / STATS — 2 CLEAN CUSTOM SVG CHARTS)
+         ---------------------------------------------------------------------- */
+      function renderStats() {
+        const summary = getMonthSummary(ui.viewYear, ui.viewMonth, db.settings.includeMSI);
+
+        // Top KPI Strip
+        const ratioText = summary.income > 0
+          ? `${Math.round((summary.totalExpense / summary.income) * 100)}%`
+          : (summary.totalExpense > 0 ? "Sin ing." : "0%");
+        const netColor = summary.netBalance >= 0 ? "var(--income)" : "var(--expense)";
+        const netLabel = summary.netBalance >= 0 ? "Ahorro neto" : "Déficit";
+
+        document.getElementById("statsKpiStrip").innerHTML = `
+          <div class="kpi-mini">
+            <div class="kpi-mini-label">Gasto / Ingreso</div>
+            <div class="kpi-mini-val tabular" style="color:${summary.spentPct > 100 ? "var(--expense)" : "var(--accent-sky)"}">${ratioText}</div>
+          </div>
+          <div class="kpi-mini">
+            <div class="kpi-mini-label">${netLabel}</div>
+            <div class="kpi-mini-val tabular" style="color:${netColor}">${formatMXN(summary.netBalance, true)}</div>
+          </div>
+          <div class="kpi-mini">
+            <div class="kpi-mini-label">Carga MSI</div>
+            <div class="kpi-mini-val tabular" style="color:var(--accent-soft)">${formatMXN(summary.msiMonthly, true)}</div>
+          </div>
+        `;
+
+        // Chart 1: Bar Chart
+        renderBarChart();
+
+        // Chart 2: Donut Chart
+        renderDonutChart(summary);
+
+        // Payment Method Breakdown
+        renderMethodBreakdown(summary);
+      }
+
+      function renderBarChart() {
+        const data = [];
+        if (ui.barMode === "6m") {
+          for (let i = 5; i >= 0; i--) {
+            let m = ui.viewMonth - i;
+            let y = ui.viewYear;
+            while (m < 0) { m += 12; y--; }
+            const s = getMonthSummary(y, m, db.settings.includeMSI);
+            data.push({
+              label: MONTHS_SHORT[m],
+              fullLabel: `${MONTHS_LONG[m]} ${y}`,
+              income: s.income,
+              expense: s.totalExpense
+            });
+          }
+        } else {
+          // 4-5 weeks inside viewed month (days 1-7, 8-14, 15-21, 22-end)
+          const txs = getMonthTransactions(ui.viewYear, ui.viewMonth);
+          const buckets = [
+            { label: "Sem 1", fullLabel: "Días 1–7", income: 0, expense: 0 },
+            { label: "Sem 2", fullLabel: "Días 8–14", income: 0, expense: 0 },
+            { label: "Sem 3", fullLabel: "Días 15–21", income: 0, expense: 0 },
+            { label: "Sem 4", fullLabel: "Días 22–fin", income: 0, expense: 0 }
+          ];
+          for (const tx of txs) {
+            const day = parseISODate(tx.date).getDate();
+            const idx = day <= 7 ? 0 : (day <= 14 ? 1 : (day <= 21 ? 2 : 3));
+            if (tx.type === "income") buckets[idx].income += Number(tx.amount) || 0;
+            else buckets[idx].expense += Number(tx.amount) || 0;
+          }
+          data.push(...buckets);
+        }
+
+        if (ui.selectedBarIndex === null || ui.selectedBarIndex >= data.length) {
+          ui.selectedBarIndex = data.length - 1;
+        }
+
+        const sel = data[ui.selectedBarIndex];
+        const pct = sel.income > 0 ? Math.round((sel.expense / sel.income) * 100) : null;
+        document.getElementById("barReadout").innerHTML = `
+          <div>
+            <strong style="color:var(--text-primary);">${escapeHtml(sel.fullLabel)}</strong>
+            <span style="color:var(--text-secondary); margin-left:6px;">${pct !== null ? `(${pct}% gastado)` : ""}</span>
+          </div>
+          <div style="display:flex; gap:10px;">
+            <span style="color:var(--income); font-weight:700;">+${formatMXN(sel.income, true)}</span>
+            <span style="color:var(--expense); font-weight:700;">-${formatMXN(sel.expense, true)}</span>
+          </div>
+        `;
+
+        const svg = document.getElementById("barChartSvg");
+        const W = 340, H = 188, topPad = 20, bottomPad = 26, chartH = H - topPad - bottomPad;
+        const maxVal = Math.max(100, ...data.map(d => Math.max(d.income, d.expense)));
+
+        let markup = "";
+        // Subtle horizontal gridlines
+        for (let g = 0; g <= 2; g++) {
+          const y = topPad + (chartH / 2) * g;
+          markup += `<line x1="8" y1="${y}" x2="${W - 8}" y2="${y}" stroke="rgba(148,163,184,0.12)" stroke-dasharray="3 4" />`;
+        }
+
+        const groupW = (W - 16) / data.length;
+        const barW = Math.min(18, groupW * 0.30);
+        const gap = 4;
+
+        data.forEach((d, idx) => {
+          const cx = 8 + groupW * idx + groupW / 2;
+          const incH = d.income > 0 ? Math.max(6, (d.income / maxVal) * chartH) : 3;
+          const expH = d.expense > 0 ? Math.max(6, (d.expense / maxVal) * chartH) : 3;
+          const incY = topPad + chartH - incH;
+          const expY = topPad + chartH - expH;
+          const isSel = idx === ui.selectedBarIndex;
+          const expColor = d.expense > d.income && d.expense > 0 ? "#FB7185" : "#3B82F6";
+
+          markup += `
+            <g class="bar-group" data-bar-idx="${idx}" opacity="${isSel ? 1 : 0.62}">
+              ${isSel ? `<rect x="${cx - barW - gap - 5}" y="${topPad - 6}" width="${barW * 2 + gap * 2 + 10}" height="${chartH + 10}" rx="12" fill="rgba(56,189,248,0.09)" />` : ""}
+              <rect x="${cx - barW - gap / 2}" y="${incY}" width="${barW}" height="${incH}" rx="6" fill="#34D399" />
+              <rect x="${cx + gap / 2}" y="${expY}" width="${barW}" height="${expH}" rx="6" fill="${expColor}" />
+              <text x="${cx}" y="${H - 7}" text-anchor="middle" fill="${isSel ? "#F8FAFC" : "#94A3B8"}" font-size="11" font-weight="${isSel ? 700 : 500}">${escapeHtml(d.label)}</text>
+            </g>
+          `;
+        });
+
+        svg.innerHTML = markup;
+        svg.querySelectorAll(".bar-group").forEach(g => {
+          g.addEventListener("click", () => {
+            ui.selectedBarIndex = Number(g.dataset.barIdx);
+            renderBarChart();
+          });
+        });
+      }
+
+      function renderDonutChart(summary) {
+        const container = document.getElementById("donutContainer");
+        const rankEl = document.getElementById("categoryRankList");
+        document.getElementById("donutMsiNote").textContent = db.settings.includeMSI ? "Incluye MSI" : "Solo gastos diarios";
+
+        const byCat = {};
+        for (const tx of summary.txs) {
+          if (tx.type !== "expense") continue;
+          const id = tx.categoryId;
+          if (!byCat[id]) {
+            const cat = findCategory("expense", id);
+            byCat[id] = { id, name: cat.name, emoji: cat.emoji, amount: 0 };
+          }
+          byCat[id].amount += Number(tx.amount) || 0;
+        }
+
+        if (db.settings.includeMSI && summary.msiMonthly > 0) {
+          byCat["__msi__"] = {
+            id: "__msi__",
+            name: "Mensualidades MSI",
+            emoji: "🗓️",
+            amount: summary.msiMonthly
+          };
+        }
+
+        const items = Object.values(byCat).filter(x => x.amount > 0).sort((a, b) => b.amount - a.amount);
+        const total = items.reduce((s, x) => s + x.amount, 0);
+
+        if (total <= 0) {
+          container.innerHTML = `<div style="padding:18px 0; color:var(--text-secondary); font-size:13px; text-align:center;">Sin gastos registrados en ${MONTHS_LONG[ui.viewMonth]}</div>`;
+          rankEl.innerHTML = "";
+          return;
+        }
+
+        items.forEach((item, idx) => {
+          item.color = DONUT_COLORS[idx % DONUT_COLORS.length];
+          item.pct = (item.amount / total) * 100;
+        });
+
+        if (ui.selectedDonutId && !items.some(i => i.id === ui.selectedDonutId)) {
+          ui.selectedDonutId = null;
+        }
+
+        const activeItem = items.find(i => i.id === ui.selectedDonutId);
+        const R = 68;
+        const C = 2 * Math.PI * R;
+        let offset = 0;
+
+        const slicesSvg = items.map(item => {
+          const len = (item.pct / 100) * C;
+          const dashLen = Math.max(2, len - (items.length > 1 ? 3 : 0));
+          const isHighlighted = !ui.selectedDonutId || ui.selectedDonutId === item.id;
+          const strokeW = ui.selectedDonutId === item.id ? 28 : 23;
+          const seg = `
+            <circle class="donut-slice" data-slice-id="${escapeHtml(item.id)}"
+              cx="92" cy="92" r="${R}"
+              stroke="${item.color}"
+              stroke-width="${strokeW}"
+              stroke-dasharray="${dashLen} ${C}"
+              stroke-dashoffset="${-offset}"
+              opacity="${isHighlighted ? 1 : 0.3}"
+              stroke-linecap="butt" />
+          `;
+          offset += len;
+          return seg;
+        }).join("");
+
+        container.innerHTML = `
+          <div class="donut-box">
+            <svg class="donut-svg" viewBox="0 0 184 184">
+              <circle cx="92" cy="92" r="${R}" fill="none" stroke="rgba(148,163,184,0.1)" stroke-width="23"></circle>
+              ${slicesSvg}
+            </svg>
+            <div class="donut-center">
+              <span class="donut-center-label">${escapeHtml(activeItem ? activeItem.name : "Total gastado")}</span>
+              <span class="donut-center-val tabular">${formatMXN(activeItem ? activeItem.amount : total, true)}</span>
+              <span class="donut-center-pct tabular">${activeItem ? Math.round(activeItem.pct) + "% del mes" : items.length + " rubros"}</span>
+            </div>
+          </div>
+        `;
+
+        rankEl.innerHTML = items.map(item => `
+          <div class="rank-row ${ui.selectedDonutId === item.id ? "highlighted" : ""}" data-slice-id="${escapeHtml(item.id)}">
+            <div class="rank-top">
+              <span class="rank-name">
+                <span>${escapeHtml(item.emoji)}</span>
+                <span class="txt">${escapeHtml(item.name)}</span>
+              </span>
+              <span class="rank-nums tabular">
+                <span>${formatMXN(item.amount)}</span>
+                <span class="rank-pct">${Math.round(item.pct)}%</span>
+              </span>
+            </div>
+            <div class="progress-track">
+              <div class="progress-fill" style="width:${item.pct.toFixed(1)}%; background:${item.color};"></div>
+            </div>
+          </div>
+        `).join("");
+
+        const toggleSlice = (id) => {
+          ui.selectedDonutId = ui.selectedDonutId === id ? null : id;
+          renderDonutChart(summary);
+        };
+
+        container.querySelectorAll("[data-slice-id]").forEach(el => {
+          el.addEventListener("click", () => toggleSlice(el.dataset.sliceId));
+        });
+        rankEl.querySelectorAll("[data-slice-id]").forEach(el => {
+          el.addEventListener("click", () => toggleSlice(el.dataset.sliceId));
+        });
+      }
+
+      function renderMethodBreakdown(summary) {
+        const el = document.getElementById("methodRankList");
+        const map = {};
+
+        for (const acc of db.accounts) {
+          map[acc.id] = { acc, direct: 0, msi: 0 };
+        }
+
+        for (const tx of summary.txs) {
+          if (tx.type !== "expense") continue;
+          if (!map[tx.accountId]) {
+            map[tx.accountId] = { acc: findAccount(tx.accountId), direct: 0, msi: 0 };
+          }
+          map[tx.accountId].direct += Number(tx.amount) || 0;
+        }
+
+        for (const st of summary.msiStatuses) {
+          if (st.activeCharge > 0) {
+            const cid = st.plan.cardId;
+            if (!map[cid]) map[cid] = { acc: findAccount(cid), direct: 0, msi: 0 };
+            map[cid].msi += st.activeCharge;
+          }
+        }
+
+        const rows = Object.values(map)
+          .map(r => ({ ...r, total: r.direct + r.msi }))
+          .filter(r => r.total > 0)
+          .sort((a, b) => b.total - a.total);
+
+        if (rows.length === 0) {
+          el.innerHTML = `<div style="color:var(--text-secondary); font-size:13px; text-align:center; padding:8px 0;">Sin gastos registrados por método de pago</div>`;
+          return;
+        }
+
+        const grandTotal = rows.reduce((s, r) => s + r.total, 0);
+        el.innerHTML = rows.map(r => {
+          const pct = grandTotal > 0 ? (r.total / grandTotal) * 100 : 0;
+          const detail = r.msi > 0
+            ? `Directo ${formatMXN(r.direct, true)} + MSI ${formatMXN(r.msi, true)}`
+            : "Pago directo";
+          return `
+            <div class="rank-row">
+              <div class="rank-top">
+                <span class="rank-name">
+                  <span class="method-dot" style="width:9px;height:9px;background:${escapeHtml(r.acc.color)}"></span>
+                  <span class="txt">${escapeHtml(r.acc.name)}</span>
+                </span>
+                <span class="rank-nums tabular">${formatMXN(r.total)}</span>
+              </div>
+              <div style="display:flex; justify-content:space-between; font-size:11px; color:var(--text-secondary); margin-bottom:5px;">
+                <span>${detail}</span>
+                <span class="tabular">${Math.round(pct)}%</span>
+              </div>
+              <div class="progress-track">
+                <div class="progress-fill" style="width:${pct.toFixed(1)}%; background:${escapeHtml(r.acc.color)};"></div>
+              </div>
+            </div>
+          `;
+        }).join("");
+      }
+
+      /* ----------------------------------------------------------------------
+         RENDERING: VIEW 3 (MSI — MESES SIN INTERESES)
+         ---------------------------------------------------------------------- */
+      function renderMSI() {
+        const statuses = db.msiPlans.map(p => computeMSIStatus(p, ui.viewYear, ui.viewMonth));
+        const active = statuses.filter(s => s.status !== "completed");
+        const completed = statuses.filter(s => s.status === "completed");
+
+        const monthlySum = active.reduce((sum, s) => sum + s.activeCharge, 0);
+        const remainingSum = active.reduce((sum, s) => sum + s.remainingAmount, 0);
+
+        document.getElementById("msiMonthlyTotal").textContent = formatMXN(monthlySum);
+        document.getElementById("msiRemainingTotal").textContent = formatMXN(remainingSum);
+        document.getElementById("msiActiveBadge").textContent = `${active.length} ${active.length === 1 ? "activo" : "activos"}`;
+        document.getElementById("msiDoneCount").textContent = `${completed.length} ${completed.length === 1 ? "plan" : "planes"}`;
+
+        const activeContainer = document.getElementById("msiActiveList");
+        if (active.length === 0) {
+          activeContainer.innerHTML = `
+            <div class="empty-state">
+              <div class="empty-emoji">🗓️</div>
+              <div class="empty-title">Sin compras activas a MSI</div>
+              <div class="empty-desc">Agrega tus compras a meses sin intereses vinculadas a tu tarjeta y el pago avanzará automáticamente en cada fecha de corte.</div>
+            </div>
+          `;
+        } else {
+          activeContainer.innerHTML = active.map(s => renderMSICardHTML(s)).join("");
+        }
+
+        const compSection = document.getElementById("msiCompletedSection");
+        const compContainer = document.getElementById("msiCompletedList");
+        if (completed.length > 0) {
+          compSection.classList.remove("hidden");
+          document.getElementById("msiCompletedMeta").textContent = `${completed.length} completados`;
+          compContainer.innerHTML = completed.map(s => renderMSICardHTML(s)).join("");
+        } else {
+          compSection.classList.add("hidden");
+          compContainer.innerHTML = "";
+        }
+
+        // Bind edit / delete / manual step buttons
+        document.querySelectorAll("[data-edit-msi]").forEach(btn => {
+          btn.addEventListener("click", () => {
+            const plan = db.msiPlans.find(p => p.id === btn.dataset.editMsi);
+            if (plan) openMSIModal(plan);
+          });
+        });
+
+        document.querySelectorAll("[data-del-msi]").forEach(btn => {
+          btn.addEventListener("click", () => {
+            const plan = db.msiPlans.find(p => p.id === btn.dataset.delMsi);
+            if (!plan) return;
+            showConfirm("Eliminar compra a MSI", `¿Seguro que quieres eliminar "${plan.concept}"?`, () => {
+              db.msiPlans = db.msiPlans.filter(p => p.id !== plan.id);
+              saveData();
+              renderAll();
+              showToast("Compra a MSI eliminada");
+            }, true, "Eliminar");
+          });
+        });
+      }
+
+      function renderMSICardHTML(s) {
+        const cardName = s.card ? s.card.name : "Tarjeta";
+        const cardColor = s.card ? s.card.color : "#3B82F6";
+
+        let pillClass = "";
+        let pillText = `Pago ${s.currentInstallment} de ${s.totalMonths}`;
+        if (s.status === "completed") {
+          pillClass = "done";
+          pillText = `Liquidado (${s.totalMonths}/${s.totalMonths})`;
+        } else if (s.status === "upcoming") {
+          pillClass = "upcoming";
+          pillText = `Inicia después`;
+        }
+
+        const nextLabel = s.nextAdvanceDate
+          ? `Avanza el ${s.nextAdvanceDate.getDate()} ${MONTHS_SHORT[s.nextAdvanceDate.getMonth()]}`
+          : "Completado";
+
+        const remainingLabel = s.status === "completed"
+          ? `Total: ${formatMXN(s.plan.totalAmount)}`
+          : (s.remainingPayments === 0
+            ? "Último pago del plan"
+            : `Restan ${formatMXN(s.remainingAmount)} (${s.remainingPayments} ${s.remainingPayments === 1 ? "pago" : "pagos"})`);
+
+        return `
+          <div class="msi-card ${s.status === "completed" ? "completed" : ""}">
+            <div class="msi-top">
+              <div style="min-width:0;">
+                <div class="msi-concept">${escapeHtml(s.plan.concept)}</div>
+                <span class="method-tag">
+                  <span class="method-dot" style="background:${escapeHtml(cardColor)}"></span>
+                  ${escapeHtml(cardName)} · Corte día ${s.cutoffDay}
+                </span>
+              </div>
+              <span class="msi-pill tabular ${pillClass}">${pillText}</span>
+            </div>
+
+            <div class="msi-numbers tabular">
+              <span class="msi-monthly">${formatMXN(s.monthlyPayment)}<span style="font-size:11.5px; font-weight:500; color:var(--text-secondary);"> / mes</span></span>
+              <span class="msi-remaining">${remainingLabel}</span>
+            </div>
+
+            <div class="progress-track" style="height:8px;">
+              <div class="progress-fill" style="width:${s.progressPct.toFixed(1)}%; background:${s.status === "completed" ? "var(--income)" : "var(--accent-gradient)"};"></div>
+            </div>
+
+            <div class="msi-footer">
+              <span>${nextLabel}</span>
+              <div class="msi-actions">
+                <button type="button" class="chip-action" data-edit-msi="${escapeHtml(s.plan.id)}">Editar</button>
+                <button type="button" class="chip-action danger" data-del-msi="${escapeHtml(s.plan.id)}">Eliminar</button>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+
+      /* ----------------------------------------------------------------------
+         RENDERING: VIEW 4 (TARJETAS, CATEGORÍAS & RESPALDO)
+         ---------------------------------------------------------------------- */
+      function renderCardsView() {
+        const summary = getMonthSummary(ui.viewYear, ui.viewMonth, true);
+        const listEl = document.getElementById("accountsList");
+
+        const typeLabels = { credit: "Crédito", debit: "Débito", cash: "Efectivo" };
+
+        listEl.innerHTML = db.accounts.map(acc => {
+          const directSpend = summary.txs
+            .filter(t => t.type === "expense" && t.accountId === acc.id)
+            .reduce((s, t) => s + (Number(t.amount) || 0), 0);
+          const activeMSIs = summary.msiStatuses.filter(s => s.plan.cardId === acc.id && s.status === "active");
+          const msiSpend = activeMSIs.reduce((s, m) => s + m.activeCharge, 0);
+          const totalSpend = directSpend + msiSpend;
+
+          let countdownHtml = "";
+          if (acc.type === "credit") {
+            const daysLeft = getDaysUntilCutoff(acc.cutoffDay || 15);
+            const cutMsg = daysLeft === 0 ? "Corte hoy" : (daysLeft === 1 ? "Corte mañana" : `Corte en ${daysLeft} días`);
+            countdownHtml = `<div class="account-countdown">🗓️ ${cutMsg} · Pago día ${acc.dueDay || 5}</div>`;
+          }
+
+          return `
+            <div class="account-card" data-acc-id="${escapeHtml(acc.id)}">
+              <div class="account-stripe" style="background:${escapeHtml(acc.color)}"></div>
+              <div class="account-info">
+                <div class="account-name">
+                  <span>${escapeHtml(acc.name)}</span>
+                  <span class="type-badge">${typeLabels[acc.type] || "Cuenta"}</span>
+                </div>
+                <div class="account-sub">
+                  ${acc.type === "credit" ? `Corte día ${acc.cutoffDay || 15} · ` : ""}${activeMSIs.length > 0 ? `${activeMSIs.length} MSI activos` : "Toca para editar"}
+                </div>
+                ${countdownHtml}
+              </div>
+              <div class="account-spend tabular">
+                <div style="font-size:14.5px; font-weight:750;">${formatMXN(totalSpend)}</div>
+                <div style="font-size:11px; color:var(--text-secondary);">en ${MONTHS_SHORT[ui.viewMonth]}</div>
+              </div>
+            </div>
+          `;
+        }).join("");
+
+        listEl.querySelectorAll(".account-card").forEach(el => {
+          el.addEventListener("click", () => {
+            const acc = db.accounts.find(a => a.id === el.dataset.accId);
+            if (acc) openAccountModal(acc);
+          });
+        });
+
+        renderManageCategories();
+      }
+
+      function renderManageCategories() {
+        const list = db.categories[ui.manageCatType] || [];
+        const container = document.getElementById("manageCategoriesList");
+        container.innerHTML = list.map(cat => `
+          <div class="cat-pill-manage">
+            <span>${escapeHtml(cat.emoji)}</span>
+            <span>${escapeHtml(cat.name)}</span>
+            ${list.length > 1 ? `<button type="button" class="cat-del-x" data-del-cat="${escapeHtml(cat.id)}" aria-label="Eliminar ${escapeHtml(cat.name)}">&times;</button>` : ""}
+          </div>
+        `).join("");
+
+        container.querySelectorAll("[data-del-cat]").forEach(btn => {
+          btn.addEventListener("click", () => {
+            const catId = btn.dataset.delCat;
+            const cat = list.find(c => c.id === catId);
+            if (!cat) return;
+            showConfirm("Eliminar categoría", `¿Eliminar "${cat.emoji} ${cat.name}"? Los movimientos previos conservarán su registro.`, () => {
+              db.categories[ui.manageCatType] = db.categories[ui.manageCatType].filter(c => c.id !== catId);
+              saveData();
+              renderCardsView();
+              showToast("Categoría eliminada");
+            }, true, "Eliminar");
+          });
+        });
+      }
+
+      /* ----------------------------------------------------------------------
+         MODAL 1 LOGIC: QUICK REGISTER / EDIT TRANSACTION
+         ---------------------------------------------------------------------- */
+      function openTxModal(existingTx = null) {
+        const form = document.getElementById("txForm");
+        form.reset();
+        document.getElementById("inlineNewCatBox").classList.remove("open");
+
+        if (existingTx) {
+          document.getElementById("modalTxTitle").textContent = "Editar movimiento";
+          document.getElementById("btnSubmitTx").textContent = "Guardar cambios";
+          document.getElementById("btnDeleteTx").classList.remove("hidden");
+          document.getElementById("txId").value = existingTx.id;
+          ui.txType = existingTx.type;
+          ui.txCategoryId = existingTx.categoryId;
+          ui.txAccountId = existingTx.accountId;
+          document.getElementById("txAmount").value = String(existingTx.amount);
+          document.getElementById("txConcept").value = existingTx.concept || "";
+          document.getElementById("txDate").value = existingTx.date;
+        } else {
+          document.getElementById("modalTxTitle").textContent = "Nuevo movimiento";
+          document.getElementById("btnSubmitTx").textContent = "Guardar movimiento";
+          document.getElementById("btnDeleteTx").classList.add("hidden");
+          document.getElementById("txId").value = "";
+          ui.txType = "expense";
+          ui.txCategoryId = (db.categories.expense[0] || {}).id || null;
+          ui.txAccountId = (db.accounts[0] || {}).id || null;
+          document.getElementById("txAmount").value = "";
+          document.getElementById("txConcept").value = "";
+          document.getElementById("txDate").value = ui.fullMonthMode ? toISODate(new Date()) : ui.selectedDateStr;
+        }
+
+        updateTxTypeUI();
+        renderTxMethodChips();
+        openModal("modalTx");
+
+        if (!existingTx) {
+          setTimeout(() => document.getElementById("txAmount").focus(), 220);
+        }
+      }
+
+      function updateTxTypeUI() {
+        const expBtn = document.getElementById("btnTypeExpense");
+        const incBtn = document.getElementById("btnTypeIncome");
+        expBtn.className = "seg-btn" + (ui.txType === "expense" ? " active-expense" : "");
+        incBtn.className = "seg-btn" + (ui.txType === "income" ? " active-income" : "");
+
+        const cats = db.categories[ui.txType] || [];
+        if (!cats.some(c => c.id === ui.txCategoryId)) {
+          ui.txCategoryId = cats[0] ? cats[0].id : null;
+        }
+        renderTxCategoryChips();
+      }
+
+      function renderTxCategoryChips() {
+        const cats = db.categories[ui.txType] || [];
+        const container = document.getElementById("txCategoryChips");
+        container.innerHTML = cats.map(c => `
+          <button type="button" class="chip ${c.id === ui.txCategoryId ? "selected" : ""}" data-tx-cat="${escapeHtml(c.id)}">
+            <span>${escapeHtml(c.emoji)}</span>
+            <span>${escapeHtml(c.name)}</span>
+          </button>
+        `).join("") + `<button type="button" class="chip add-new" id="btnShowInlineCat">+ Nueva</button>`;
+
+        container.querySelectorAll("[data-tx-cat]").forEach(btn => {
+          btn.addEventListener("click", () => {
+            ui.txCategoryId = btn.dataset.txCat;
+            renderTxCategoryChips();
+          });
+        });
+
+        document.getElementById("btnShowInlineCat").addEventListener("click", () => {
+          const box = document.getElementById("inlineNewCatBox");
+          box.classList.toggle("open");
+          if (box.classList.contains("open")) {
+            renderEmojiPicker("inlineEmojiPicker", ui.inlineCatEmoji, (em) => {
+              ui.inlineCatEmoji = em;
+              renderEmojiPicker("inlineEmojiPicker", ui.inlineCatEmoji, arguments.callee);
+            });
+            document.getElementById("inlineCatName").value = "";
+            document.getElementById("inlineCatName").focus();
+          }
+        });
+      }
+
+      function renderTxMethodChips() {
+        const container = document.getElementById("txMethodChips");
+        container.innerHTML = db.accounts.map(acc => `
+          <button type="button" class="chip ${acc.id === ui.txAccountId ? "selected" : ""}" data-tx-acc="${escapeHtml(acc.id)}">
+            <span class="method-dot" style="width:8px;height:8px;background:${escapeHtml(acc.color)}"></span>
+            <span>${escapeHtml(acc.name)}</span>
+          </button>
+        `).join("");
+
+        container.querySelectorAll("[data-tx-acc]").forEach(btn => {
+          btn.addEventListener("click", () => {
+            ui.txAccountId = btn.dataset.txAcc;
+            renderTxMethodChips();
+          });
+        });
+      }
+
+      function renderEmojiPicker(containerId, selectedEmoji, onPick) {
+        const el = document.getElementById(containerId);
+        el.innerHTML = EMOJI_CHOICES.map(em => `
+          <button type="button" class="emoji-opt ${em === selectedEmoji ? "selected" : ""}" data-em="${em}">${em}</button>
+        `).join("");
+        el.querySelectorAll(".emoji-opt").forEach(btn => {
+          btn.addEventListener("click", () => onPick(btn.dataset.em));
+        });
+      }
+
+      /* ----------------------------------------------------------------------
+         MODAL 2 LOGIC: ADD / EDIT MSI
+         ---------------------------------------------------------------------- */
+      function openMSIModal(existingPlan = null) {
+        const creditCards = db.accounts.filter(a => a.type === "credit");
+        const select = document.getElementById("msiCardSelect");
+
+        if (creditCards.length === 0) {
+          showToast("Primero agrega una tarjeta de crédito en Tarjetas");
+          return;
+        }
+
+        select.innerHTML = creditCards.map(c =>
+          `<option value="${escapeHtml(c.id)}">${escapeHtml(c.name)} (Corte día ${c.cutoffDay || 15})</option>`
+        ).join("");
+
+        if (existingPlan) {
+          const st = computeMSIStatus(existingPlan, ui.viewYear, ui.viewMonth);
+          document.getElementById("modalMSITitle").textContent = "Editar compra a MSI";
+          document.getElementById("btnSubmitMSI").textContent = "Guardar cambios";
+          document.getElementById("btnDeleteMSI").classList.remove("hidden");
+          document.getElementById("msiId").value = existingPlan.id;
+          document.getElementById("msiConcept").value = existingPlan.concept;
+          document.getElementById("msiTotalAmount").value = String(existingPlan.totalAmount);
+          document.getElementById("msiTotalMonths").value = String(existingPlan.totalMonths);
+          document.getElementById("msiCurrentInstallment").value = String(Math.max(1, Math.min(existingPlan.totalMonths, st.currentInstallment || existingPlan.baseInstallment)));
+          select.value = existingPlan.cardId;
+        } else {
+          document.getElementById("modalMSITitle").textContent = "Nueva compra a MSI";
+          document.getElementById("btnSubmitMSI").textContent = "Guardar compra a MSI";
+          document.getElementById("btnDeleteMSI").classList.add("hidden");
+          document.getElementById("msiId").value = "";
+          document.getElementById("msiConcept").value = "";
+          document.getElementById("msiTotalAmount").value = "";
+          document.getElementById("msiTotalMonths").value = "12";
+          document.getElementById("msiCurrentInstallment").value = "1";
+          select.value = creditCards[0].id;
+        }
+
+        syncMSITermChips();
+        updateMSIPreview();
+        openModal("modalMSI");
+      }
+
+      function syncMSITermChips() {
+        const val = Number(document.getElementById("msiTotalMonths").value);
+        document.querySelectorAll("#msiTermChips .chip").forEach(chip => {
+          chip.classList.toggle("selected", Number(chip.dataset.term) === val);
+        });
+      }
+
+      function updateMSIPreview() {
+        const total = parseAmountInput(document.getElementById("msiTotalAmount").value);
+        const months = Math.max(1, parseInt(document.getElementById("msiTotalMonths").value, 10) || 1);
+        const monthly = total / months;
+        document.getElementById("msiMonthlyPreview").textContent = `${formatMXN(monthly)} / mes`;
+      }
+
+      /* ----------------------------------------------------------------------
+         MODAL 3 LOGIC: ADD / EDIT ACCOUNT OR CARD
+         ---------------------------------------------------------------------- */
+      function openAccountModal(existingAcc = null) {
+        if (existingAcc) {
+          document.getElementById("modalAccountTitle").textContent = "Editar tarjeta / cuenta";
+          document.getElementById("accId").value = existingAcc.id;
+          document.getElementById("accName").value = existingAcc.name;
+          document.getElementById("accType").value = existingAcc.type;
+          document.getElementById("accCutoffDay").value = existingAcc.cutoffDay || 15;
+          document.getElementById("accDueDay").value = existingAcc.dueDay || 5;
+          ui.accColor = existingAcc.color || "#2563EB";
+          document.getElementById("btnDeleteAccount").classList.toggle("hidden", db.accounts.length <= 1);
+        } else {
+          document.getElementById("modalAccountTitle").textContent = "Nueva tarjeta o cuenta";
+          document.getElementById("accId").value = "";
+          document.getElementById("accName").value = "";
+          document.getElementById("accType").value = "credit";
+          document.getElementById("accCutoffDay").value = "15";
+          document.getElementById("accDueDay").value = "5";
+          ui.accColor = "#2563EB";
+          document.getElementById("btnDeleteAccount").classList.add("hidden");
+        }
+
+        toggleCreditFields();
+        renderColorSwatches();
+        openModal("modalAccount");
+      }
+
+      function toggleCreditFields() {
+        const isCredit = document.getElementById("accType").value === "credit";
+        document.getElementById("accCreditFields").classList.toggle("hidden", !isCredit);
+      }
+
+      function renderColorSwatches() {
+        const el = document.getElementById("accColorSwatches");
+        el.innerHTML = CARD_COLORS.map(c => `
+          <button type="button" class="color-swatch ${c === ui.accColor ? "selected" : ""}" style="background:${c};" data-color="${c}" aria-label="Color ${c}"></button>
+        `).join("");
+        el.querySelectorAll(".color-swatch").forEach(btn => {
+          btn.addEventListener("click", () => {
+            ui.accColor = btn.dataset.color;
+            renderColorSwatches();
+          });
+        });
+      }
+
+      /* ----------------------------------------------------------------------
+         EXPORT (CSV & JSON), IMPORT & DEMO DATA
+         ---------------------------------------------------------------------- */
+      function downloadFile(filename, content, mimeType) {
+        const blob = new Blob([content], { type: mimeType });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        setTimeout(() => {
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+        }, 120);
+      }
+
+      function exportCSV() {
+        const header = ["Fecha", "Tipo", "Cantidad", "Categoría", "Concepto", "Método de pago"];
+        const rows = [...db.transactions]
+          .sort((a, b) => b.date.localeCompare(a.date))
+          .map(tx => {
+            const cat = findCategory(tx.type, tx.categoryId);
+            const acc = findAccount(tx.accountId);
+            return [
+              tx.date,
+              tx.type === "income" ? "Ingreso" : "Gasto",
+              (Number(tx.amount) || 0).toFixed(2),
+              cat.name,
+              tx.concept || "",
+              acc.name
+            ].map(field => `"${String(field).replace(/"/g, '""')}"`).join(",");
+          });
+
+        const csv = "\uFEFF" + [header.join(","), ...rows].join("\n");
+        const dateTag = toISODate(new Date());
+        downloadFile(`Interamb_Historial_${dateTag}.csv`, csv, "text/csv;charset=utf-8;");
+        showToast("CSV exportado correctamente");
+      }
+
+      function exportJSON() {
+        const payload = {
+          app: "Interamb",
+          version: 1,
+          exportedAt: new Date().toISOString(),
+          data: db
+        };
+        const dateTag = toISODate(new Date());
+        downloadFile(`Interamb_Respaldo_${dateTag}.json`, JSON.stringify(payload, null, 2), "application/json");
+        showToast("Respaldo JSON descargado");
+      }
+
+      function handleImportJSON(file) {
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          try {
+            const parsed = JSON.parse(e.target.result);
+            const imported = parsed.data ? parsed.data : parsed;
+            if (!Array.isArray(imported.transactions) || !Array.isArray(imported.accounts)) {
+              throw new Error("Formato inválido");
+            }
+            showConfirm(
+              "Restaurar respaldo",
+              `Se importarán ${imported.transactions.length} movimientos y ${(imported.msiPlans || []).length} planes MSI. Esto reemplazará tus datos actuales.`,
+              () => {
+                db = {
+                  accounts: imported.accounts,
+                  categories: imported.categories || createDefaultData().categories,
+                  transactions: imported.transactions,
+                  msiPlans: imported.msiPlans || [],
+                  settings: imported.settings || { includeMSI: true }
+                };
+                saveData();
+                renderAll();
+                showToast("Respaldo restaurado con éxito");
+              },
+              false,
+              "Restaurar"
+            );
+          } catch (err) {
+            showToast("El archivo JSON no es un respaldo válido");
+          }
+        };
+        reader.readAsText(file);
+      }
+
+      function promptLoadDemoData() {
+        const doLoad = () => {
+          const base = createDefaultData();
+          const today = new Date();
+          const y = today.getFullYear();
+          const m = today.getMonth();
+
+          function makeDate(monthOffset, day) {
+            let ty = y, tm = m + monthOffset;
+            while (tm < 0) { tm += 12; ty--; }
+            while (tm > 11) { tm -= 12; ty++; }
+            const d = Math.min(day, daysInMonth(ty, tm));
+            return `${ty}-${pad2(tm + 1)}-${pad2(d)}`;
+          }
+
+          base.transactions = [
+            // Current month
+            { id: uid("tx"), type: "income", amount: 14500, categoryId: "cat_inc_trabajo", accountId: "acc_bbva_deb", concept: "Proyecto diseño UI", date: makeDate(0, 2), createdAt: 10 },
+            { id: uid("tx"), type: "income", amount: 6800, categoryId: "cat_inc_general", accountId: "acc_bbva_deb", concept: "Consultoría quincenal", date: makeDate(0, 15), createdAt: 11 },
+            { id: uid("tx"), type: "expense", amount: 1280, categoryId: "cat_exp_alimento", accountId: "acc_bbva_deb", concept: "Súper semanal", date: makeDate(0, 4), createdAt: 12 },
+            { id: uid("tx"), type: "expense", amount: 340, categoryId: "cat_exp_transporte", accountId: "acc_cash", concept: "Recarga metro y Uber", date: makeDate(0, 6), createdAt: 13 },
+            { id: uid("tx"), type: "expense", amount: 890, categoryId: "cat_exp_suscripciones", accountId: "acc_mp_cred", concept: "Internet y Spotify", date: makeDate(0, 9), createdAt: 14 },
+            { id: uid("tx"), type: "expense", amount: 2450, categoryId: "cat_exp_necesidades", accountId: "acc_bbva_cred", concept: "Farmacia y despensa", date: makeDate(0, 12), createdAt: 15 },
+            { id: uid("tx"), type: "expense", amount: 620, categoryId: "cat_exp_entretenimiento", accountId: "acc_citi_cred", concept: "Cine y cena", date: makeDate(0, 16), createdAt: 16 },
+            { id: uid("tx"), type: "expense", amount: 750, categoryId: "cat_exp_regalos", accountId: "acc_bbva_cred", concept: "Detalle cumpleaños", date: makeDate(0, Math.min(today.getDate(), 19)), createdAt: 17 },
+            { id: uid("tx"), type: "expense", amount: 195, categoryId: "cat_exp_alimento", accountId: "acc_cash", concept: "Café y desayuno", date: toISODate(today), createdAt: 18 },
+
+            // Previous 3 months for rich 6-month bar chart
+            { id: uid("tx"), type: "income", amount: 18900, categoryId: "cat_inc_trabajo", accountId: "acc_bbva_deb", concept: "Ingresos del mes", date: makeDate(-1, 5), createdAt: 5 },
+            { id: uid("tx"), type: "expense", amount: 8400, categoryId: "cat_exp_necesidades", accountId: "acc_bbva_deb", concept: "Gastos fijos y casa", date: makeDate(-1, 10), createdAt: 6 },
+            { id: uid("tx"), type: "expense", amount: 3100, categoryId: "cat_exp_alimento", accountId: "acc_bbva_cred", concept: "Comidas y despensa", date: makeDate(-1, 18), createdAt: 7 },
+
+            { id: uid("tx"), type: "income", amount: 16200, categoryId: "cat_inc_trabajo", accountId: "acc_bbva_deb", concept: "Pagos recibidos", date: makeDate(-2, 4), createdAt: 3 },
+            { id: uid("tx"), type: "expense", amount: 11200, categoryId: "cat_exp_necesidades", accountId: "acc_citi_cred", concept: "Gastos varios del mes", date: makeDate(-2, 14), createdAt: 4 },
+
+            { id: uid("tx"), type: "income", amount: 19500, categoryId: "cat_inc_trabajo", accountId: "acc_bbva_deb", concept: "Proyectos freelance", date: makeDate(-3, 7), createdAt: 1 },
+            { id: uid("tx"), type: "expense", amount: 9600, categoryId: "cat_exp_alimento", accountId: "acc_mp_cred", concept: "Gastos generales", date: makeDate(-3, 20), createdAt: 2 }
+          ];
+
+          const todayStr = toISODate(today);
+          base.msiPlans = [
+            {
+              id: uid("msi"),
+              concept: "MacBook Air M3",
+              totalAmount: 21600,
+              totalMonths: 18,
+              baseInstallment: 4,
+              referenceDate: todayStr,
+              cardId: "acc_bbva_cred"
+            },
+            {
+              id: uid("msi"),
+              concept: "Vuelo redondo CDMX–CUN",
+              totalAmount: 5400,
+              totalMonths: 6,
+              baseInstallment: 2,
+              referenceDate: todayStr,
+              cardId: "acc_citi_cred"
+            },
+            {
+              id: uid("msi"),
+              concept: "Audífonos Sony WH-1000XM5",
+              totalAmount: 6300,
+              totalMonths: 9,
+              baseInstallment: 7,
+              referenceDate: todayStr,
+              cardId: "acc_mp_cred"
+            }
+          ];
+
+          db = base;
+          saveData();
+          ui.viewYear = y;
+          ui.viewMonth = m;
+          ui.fullMonthMode = true;
+          renderAll();
+          showToast("Datos de prueba cargados");
+        };
+
+        if (db.transactions.length > 0 || db.msiPlans.length > 0) {
+          showConfirm(
+            "Cargar datos de prueba",
+            "Esto reemplazará tus movimientos actuales con datos de ejemplo para probar las gráficas y MSI.",
+            doLoad,
+            false,
+            "Cargar ejemplos"
+          );
+        } else {
+          doLoad();
+        }
+      }
+
+      /* ----------------------------------------------------------------------
+         EVENT LISTENERS & NAVIGATION WIRING
+         ---------------------------------------------------------------------- */
+      function switchView(viewName) {
+        ui.activeView = viewName;
+        document.querySelectorAll(".view").forEach(v => v.classList.remove("active"));
+        const target = document.getElementById(`view-${viewName}`);
+        if (target) target.classList.add("active");
+
+        document.querySelectorAll(".nav-btn[data-view]").forEach(btn => {
+          btn.classList.toggle("active", btn.dataset.view === viewName);
+        });
+
+        document.getElementById("appContent").scrollTop = 0;
+        renderAll();
+      }
+
+      function bindEvents() {
+        // Bottom nav
+        document.querySelectorAll(".nav-btn[data-view]").forEach(btn => {
+          btn.addEventListener("click", () => switchView(btn.dataset.view));
+        });
+
+        // Floating center "+" button
+        document.getElementById("btnFabAdd").addEventListener("click", () => openTxModal());
+
+        // Month switchers across views
+        document.querySelectorAll("[data-month-nav]").forEach(btn => {
+          btn.addEventListener("click", () => {
+            const delta = Number(btn.dataset.monthNav);
+            let m = ui.viewMonth + delta;
+            let y = ui.viewYear;
+            if (m < 0) { m = 11; y--; }
+            if (m > 11) { m = 0; y++; }
+            ui.viewMonth = m;
+            ui.viewYear = y;
+            ui.fullMonthMode = true;
+            ui.weekAnchorDate = new Date(y, m, Math.min(new Date().getDate(), daysInMonth(y, m)));
+            ui.selectedBarIndex = null;
+            ui.selectedDonutId = null;
+            renderAll();
+          });
+        });
+
+        // Clicking month label jumps back to current month
+        document.querySelectorAll("[data-month-label]").forEach(el => {
+          el.addEventListener("click", () => {
+            const t = new Date();
+            ui.viewYear = t.getFullYear();
+            ui.viewMonth = t.getMonth();
+            ui.weekAnchorDate = new Date(t.getFullYear(), t.getMonth(), t.getDate());
+            ui.selectedDateStr = toISODate(t);
+            ui.fullMonthMode = true;
+            renderAll();
+            showToast("Mes actual");
+          });
+        });
+
+        // Hero Include MSI Toggle
+        document.getElementById("btnToggleMSI").addEventListener("click", () => {
+          db.settings.includeMSI = !db.settings.includeMSI;
+          saveData();
+          renderAll();
+          showToast(db.settings.includeMSI ? "MSI incluidos en el balance" : "Mostrando solo gastos diarios");
+        });
+
+        // Weekly Calendar Navigation
+        document.getElementById("btnPrevWeek").addEventListener("click", () => {
+          ui.weekAnchorDate.setDate(ui.weekAnchorDate.getDate() - 7);
+          renderWeekStrip();
+        });
+        document.getElementById("btnNextWeek").addEventListener("click", () => {
+          ui.weekAnchorDate.setDate(ui.weekAnchorDate.getDate() + 7);
+          renderWeekStrip();
+        });
+        document.getElementById("btnFullMonth").addEventListener("click", () => {
+          ui.fullMonthMode = true;
+          renderHome();
+        });
+
+        // Quick Export button in Home header
+        document.getElementById("btnQuickExport").addEventListener("click", () => openModal("modalQuickExport"));
+        document.getElementById("btnQuickCSV").addEventListener("click", () => { closeModal("modalQuickExport"); exportCSV(); });
+        document.getElementById("btnQuickJSON").addEventListener("click", () => { closeModal("modalQuickExport"); exportJSON(); });
+
+        // Stats Bar Chart Toggle (6m vs week)
+        document.querySelectorAll("[data-bar-mode]").forEach(btn => {
+          btn.addEventListener("click", () => {
+            ui.barMode = btn.dataset.barMode;
+            ui.selectedBarIndex = null;
+            document.querySelectorAll("[data-bar-mode]").forEach(b => b.classList.toggle("active", b === btn));
+            renderBarChart();
+          });
+        });
+
+        // Close modal buttons & backdrop click
+        document.querySelectorAll("[data-close-modal]").forEach(btn => {
+          btn.addEventListener("click", () => closeModal(btn.dataset.closeModal));
+        });
+        document.querySelectorAll(".modal-backdrop").forEach(backdrop => {
+          backdrop.addEventListener("click", (e) => {
+            if (e.target === backdrop) backdrop.classList.remove("open");
+          });
+        });
+
+        // Confirm dialog buttons
+        document.getElementById("btnConfirmCancel").addEventListener("click", () => {
+          closeModal("modalConfirm");
+          ui.confirmCallback = null;
+        });
+        document.getElementById("btnConfirmOk").addEventListener("click", () => {
+          closeModal("modalConfirm");
+          const cb = ui.confirmCallback;
+          ui.confirmCallback = null;
+          if (typeof cb === "function") cb();
+        });
+
+        // Transaction Modal Events
+        document.getElementById("btnTypeExpense").addEventListener("click", () => { ui.txType = "expense"; updateTxTypeUI(); });
+        document.getElementById("btnTypeIncome").addEventListener("click", () => { ui.txType = "income"; updateTxTypeUI(); });
+
+        document.getElementById("btnCancelInlineCat").addEventListener("click", () => {
+          document.getElementById("inlineNewCatBox").classList.remove("open");
+        });
+
+        document.getElementById("btnSaveInlineCat").addEventListener("click", () => {
+          const name = document.getElementById("inlineCatName").value.trim();
+          if (!name) {
+            showToast("Escribe un nombre para la categoría");
+            return;
+          }
+          const newCat = { id: uid("cat"), name, emoji: ui.inlineCatEmoji || "🏷️", builtIn: false };
+          db.categories[ui.txType].push(newCat);
+          ui.txCategoryId = newCat.id;
+          saveData();
+          document.getElementById("inlineNewCatBox").classList.remove("open");
+          renderTxCategoryChips();
+          showToast(`Categoría "${name}" agregada`);
+        });
+
+        document.getElementById("txForm").addEventListener("submit", (e) => {
+          e.preventDefault();
+          const amount = parseAmountInput(document.getElementById("txAmount").value);
+          if (amount <= 0) {
+            showToast("Ingresa una cantidad mayor a $0");
+            document.getElementById("txAmount").focus();
+            return;
+          }
+          const dateVal = document.getElementById("txDate").value || toISODate(new Date());
+          const concept = document.getElementById("txConcept").value.trim();
+          const existingId = document.getElementById("txId").value;
+
+          if (existingId) {
+            const idx = db.transactions.findIndex(t => t.id === existingId);
+            if (idx !== -1) {
+              db.transactions[idx] = {
+                ...db.transactions[idx],
+                type: ui.txType,
+                amount,
+                categoryId: ui.txCategoryId,
+                accountId: ui.txAccountId,
+                concept,
+                date: dateVal
+              };
+            }
+            showToast("Movimiento actualizado");
+          } else {
+            db.transactions.push({
+              id: uid("tx"),
+              type: ui.txType,
+              amount,
+              categoryId: ui.txCategoryId,
+              accountId: ui.txAccountId,
+              concept,
+              date: dateVal,
+              createdAt: Date.now()
+            });
+            showToast(ui.txType === "income" ? "Ingreso registrado" : "Gasto registrado");
+          }
+
+          // Jump calendar view to the saved transaction's month so user sees it immediately
+          const savedD = parseISODate(dateVal);
+          ui.viewYear = savedD.getFullYear();
+          ui.viewMonth = savedD.getMonth();
+          saveData();
+          closeModal("modalTx");
+          renderAll();
+        });
+
+        document.getElementById("btnDeleteTx").addEventListener("click", () => {
+          const txId = document.getElementById("txId").value;
+          if (!txId) return;
+          showConfirm("Eliminar movimiento", "¿Deseas eliminar este registro permanentemente?", () => {
+            db.transactions = db.transactions.filter(t => t.id !== txId);
+            saveData();
+            closeModal("modalTx");
+            renderAll();
+            showToast("Movimiento eliminado");
+          }, true, "Eliminar");
+        });
+
+        // MSI Modal Events
+        document.getElementById("btnOpenAddMSI").addEventListener("click", () => openMSIModal());
+
+        document.querySelectorAll("#msiTermChips .chip").forEach(chip => {
+          chip.addEventListener("click", () => {
+            document.getElementById("msiTotalMonths").value = chip.dataset.term;
+            syncMSITermChips();
+            updateMSIPreview();
+          });
+        });
+
+        document.getElementById("msiTotalAmount").addEventListener("input", updateMSIPreview);
+        document.getElementById("msiTotalMonths").addEventListener("input", () => {
+          syncMSITermChips();
+          updateMSIPreview();
+        });
+
+        document.getElementById("msiForm").addEventListener("submit", (e) => {
+          e.preventDefault();
+          const concept = document.getElementById("msiConcept").value.trim();
+          const totalAmount = parseAmountInput(document.getElementById("msiTotalAmount").value);
+          const totalMonths = parseInt(document.getElementById("msiTotalMonths").value, 10);
+          const currentInst = parseInt(document.getElementById("msiCurrentInstallment").value, 10);
+          const cardId = document.getElementById("msiCardSelect").value;
+
+          if (!concept) { showToast("Escribe el concepto de la compra"); return; }
+          if (totalAmount <= 0) { showToast("Ingresa un monto total válido"); return; }
+          if (!totalMonths || totalMonths < 2) { showToast("El plazo mínimo es de 2 meses"); return; }
+          if (!currentInst || currentInst < 1 || currentInst > totalMonths) {
+            showToast(`El pago actual debe estar entre 1 y ${totalMonths}`);
+            return;
+          }
+
+          const existingId = document.getElementById("msiId").value;
+          const refDateStr = toISODate(getEvalDateForMonth(ui.viewYear, ui.viewMonth));
+
+          if (existingId) {
+            const idx = db.msiPlans.findIndex(p => p.id === existingId);
+            if (idx !== -1) {
+              db.msiPlans[idx] = {
+                ...db.msiPlans[idx],
+                concept,
+                totalAmount,
+                totalMonths,
+                baseInstallment: currentInst,
+                referenceDate: refDateStr,
+                cardId
+              };
+            }
+            showToast("Plan MSI actualizado");
+          } else {
+            db.msiPlans.push({
+              id: uid("msi"),
+              concept,
+              totalAmount,
+              totalMonths,
+              baseInstallment: currentInst,
+              referenceDate: refDateStr,
+              cardId
+            });
+            showToast("Compra a MSI agregada");
+          }
+
+          saveData();
+          closeModal("modalMSI");
+          renderAll();
+        });
+
+        document.getElementById("btnDeleteMSI").addEventListener("click", () => {
+          const id = document.getElementById("msiId").value;
+          if (!id) return;
+          showConfirm("Eliminar compra a MSI", "¿Seguro que quieres eliminar este plan de meses sin intereses?", () => {
+            db.msiPlans = db.msiPlans.filter(p => p.id !== id);
+            saveData();
+            closeModal("modalMSI");
+            renderAll();
+            showToast("Plan MSI eliminado");
+          }, true, "Eliminar");
+        });
+
+        // Accounts / Cards Modal Events
+        document.getElementById("btnAddAccount").addEventListener("click", () => openAccountModal());
+        document.getElementById("accType").addEventListener("change", toggleCreditFields);
+
+        document.getElementById("accountForm").addEventListener("submit", (e) => {
+          e.preventDefault();
+          const name = document.getElementById("accName").value.trim();
+          const type = document.getElementById("accType").value;
+          const cutoffDay = Math.min(31, Math.max(1, parseInt(document.getElementById("accCutoffDay").value, 10) || 15));
+          const dueDay = Math.min(31, Math.max(1, parseInt(document.getElementById("accDueDay").value, 10) || 5));
+
+          if (!name) { showToast("Escribe el nombre de la cuenta o tarjeta"); return; }
+
+          const existingId = document.getElementById("accId").value;
+          const payload = {
+            id: existingId || uid("acc"),
+            name,
+            type,
+            color: ui.accColor,
+            ...(type === "credit" ? { cutoffDay, dueDay } : {})
+          };
+
+          if (existingId) {
+            const idx = db.accounts.findIndex(a => a.id === existingId);
+            if (idx !== -1) db.accounts[idx] = payload;
+            showToast("Cuenta actualizada");
+          } else {
+            db.accounts.push(payload);
+            showToast("Cuenta agregada");
+          }
+
+          saveData();
+          closeModal("modalAccount");
+          renderAll();
+        });
+
+        document.getElementById("btnDeleteAccount").addEventListener("click", () => {
+          const id = document.getElementById("accId").value;
+          if (!id || db.accounts.length <= 1) return;
+          showConfirm("Eliminar cuenta", "¿Eliminar esta tarjeta o cuenta? Tus registros pasados se mantendrán en el historial.", () => {
+            db.accounts = db.accounts.filter(a => a.id !== id);
+            saveData();
+            closeModal("modalAccount");
+            renderAll();
+            showToast("Cuenta eliminada");
+          }, true, "Eliminar");
+        });
+
+        // Settings Categories Events
+        document.querySelectorAll("[data-cat-tab]").forEach(btn => {
+          btn.addEventListener("click", () => {
+            ui.manageCatType = btn.dataset.catTab;
+            document.querySelectorAll("[data-cat-tab]").forEach(b => b.classList.toggle("active", b === btn));
+            renderManageCategories();
+          });
+        });
+
+        document.getElementById("btnOpenSettingsNewCat").addEventListener("click", () => {
+          document.getElementById("modalCatTitle").textContent =
+            ui.manageCatType === "expense" ? "Nueva categoría de gasto" : "Nueva categoría de ingreso";
+          document.getElementById("settingsCatName").value = "";
+          const pick = (em) => {
+            ui.settingsCatEmoji = em;
+            renderEmojiPicker("settingsEmojiPicker", ui.settingsCatEmoji, pick);
+          };
+          renderEmojiPicker("settingsEmojiPicker", ui.settingsCatEmoji, pick);
+          openModal("modalCategory");
+          setTimeout(() => document.getElementById("settingsCatName").focus(), 180);
+        });
+
+        document.getElementById("settingsCatForm").addEventListener("submit", (e) => {
+          e.preventDefault();
+          const name = document.getElementById("settingsCatName").value.trim();
+          if (!name) { showToast("Escribe un nombre"); return; }
+          db.categories[ui.manageCatType].push({
+            id: uid("cat"),
+            name,
+            emoji: ui.settingsCatEmoji || "🏷️",
+            builtIn: false
+          });
+          saveData();
+          closeModal("modalCategory");
+          renderCardsView();
+          showToast(`Categoría "${name}" agregada`);
+        });
+
+        // Backup & Export Events
+        document.getElementById("btnExportCSV").addEventListener("click", exportCSV);
+        document.getElementById("btnExportJSON").addEventListener("click", exportJSON);
+        document.getElementById("btnImportJSONTrigger").addEventListener("click", () => {
+          document.getElementById("inputImportJSON").value = "";
+          document.getElementById("inputImportJSON").click();
+        });
+        document.getElementById("inputImportJSON").addEventListener("change", (e) => {
+          if (e.target.files && e.target.files[0]) handleImportJSON(e.target.files[0]);
+        });
+        document.getElementById("btnLoadDemoSettings").addEventListener("click", promptLoadDemoData);
+        document.getElementById("btnResetAll").addEventListener("click", () => {
+          showConfirm(
+            "Restablecer todos los datos",
+            "Se borrarán todos tus movimientos y planes MSI, restaurando tus tarjetas y categorías iniciales. Te recomendamos guardar un respaldo JSON primero.",
+            () => {
+              db = createDefaultData();
+              saveData();
+              const t = new Date();
+              ui.viewYear = t.getFullYear();
+              ui.viewMonth = t.getMonth();
+              ui.fullMonthMode = true;
+              renderAll();
+              showToast("Aplicación restablecida");
+            },
+            true,
+            "Restablecer"
+          );
+        });
+      }
+
+      /* ----------------------------------------------------------------------
+         BOOTSTRAP
+         ---------------------------------------------------------------------- */
+      setupOfflinePWA();
+      bindEvents();
+      renderAll();
+    })();
+  </script>
+</body>
+</html>
